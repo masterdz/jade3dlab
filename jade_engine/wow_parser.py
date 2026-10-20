@@ -36,113 +36,203 @@ def get_group(name: str) -> str:
     return "Other"
 
 
-def parse_mesh_block(reader: BinaryReader, hash_id: str) -> Optional[Mesh]:
-    version = reader.read_hex()
+def _read_u32_from_block(block: bytes, pos: int) -> int:
+    return struct.unpack_from('<I', block, pos)[0]
 
-    if version not in ("00000007", "00000008"):
-        return None
 
-    mesh = Mesh(hash_id=hash_id)
+def _skip_pos(pos: int, n: int) -> int:
+    return pos + n
 
-    flags = reader.read_int()
-    has_second_mesh = reader.read_int() != 0
 
-    num_vertices = reader.read_int()
-    num_unknown = reader.read_int()
-    has_unknown_data = reader.read_int() != 0
-    num_uvs = reader.read_int()
-    num_materials = reader.read_int()
+def parse_mesh_from_block(block: bytes) -> Optional[Mesh]:
+    """Parse a mesh from a block that starts after the 99C0FFEE separator.
+    The block layout after separator is:
+    - u32: header/marker (e.g., 0x1B003A16)
+    - u32: ".wow" magic (0x776F772E)
+    - 1 byte: separator (0x0A)
+    - null-terminated ASCII filename
+    - mesh vertex data follows
+    """
+    length = len(block)
+    pos = 0
 
-    if flags & 0x8 or flags & 0x10:
-        reader.read_float()
-        has_normals = reader.read_short() != 0
-        num4 = reader.read_short()
-        for _ in range(num4):
-            reader.read_short()
-            num_floats = reader.read_short()
-            reader.read_float(16)
-            reader.read_hex()
-            reader.read_float(num_floats)
-        if num4 > 0:
-            has_normals = (reader.read_int() != 0) or has_normals
+    # Step 1: Read header u32
+    header = _read_u32_from_block(block, pos)
+    pos += 4
+    print(f'Header: 0x{header:08X}')
+
+    # Step 2: Read .wow magic
+    wow_magic = _read_u32_from_block(block, pos)
+    print(f'.wow magic: 0x{wow_magic:08X}')
+    pos += 4
+
+    # Step 3: Skip 1 separator byte (0x0A)
+    if pos + 1 <= length:
+        sep = block[pos]
+        print(f'Separator byte: 0x{sep:02X}')
+        pos += 1
+
+    # Step 4: Read null-terminated filename starting at pos
+    # Scan for null terminator
+    fname_start = pos
+    while pos < length and block[pos] != 0:
+        pos += 1
+    fname_end = pos
+    if fname_start < fname_end:
+        filename = block[fname_start:fname_end].decode('ascii', errors='replace')
     else:
-        reader.read_int()
-        has_normals = reader.read_int() != 0
+        filename = ""
 
-    vert_data = reader.read_float(3 * num_vertices)
-    mesh.vertices = np.array(vert_data, dtype=np.float32).reshape(-1, 3)
+    print(f'Filename: "{filename}" at pos {fname_start}-{fname_end}')
 
-    if has_unknown_data:
-        reader.read_float(num_unknown)
+    # Create mesh
+    mesh = Mesh(hash_id=filename if filename else "unknown")
 
-    if has_normals:
-        normal_data = reader.read_float(3 * num_vertices)
-        mesh.normals = np.array(normal_data, dtype=np.float32).reshape(-1, 3)
+    # Step 5: Read flags u32 (next 4 bytes after filename null terminator)
+    # pos is currently at the null terminator, advance past it
+    pos += 1
+    if pos + 4 <= length:
+        flags = _read_u32_from_block(block, pos)
+        pos += 4
+    else:
+        flags = 0
 
-    uv_data = reader.read_float(2 * num_uvs)
-    mesh.uvs = np.array(uv_data, dtype=np.float32).reshape(-1, 2)
+    # Step 6: Read has_second flag
+    has_second = False
+    if pos + 4 <= length:
+        has_second = _read_u32_from_block(block, pos) != 0
+        pos += 4
 
+    # Step 7: Read num_vertices
+    if pos + 4 <= length:
+        num_vertices = _read_u32_from_block(block, pos)
+        pos += 4
+    else:
+        num_vertices = 0
+
+    # Step 8: Read num_unknown
+    num_unknown = 0
+    if pos + 4 <= length:
+        num_unknown = _read_u32_from_block(block, pos)
+        pos += 4
+
+    # Step 9: Read has_unknown
+    has_unknown = False
+    if pos + 4 <= length:
+        has_unknown = _read_u32_from_block(block, pos) != 0
+        pos += 4
+
+    # Step 10: Read num_uvs
+    num_uvs = 0
+    if pos + 4 <= length:
+        num_uvs = _read_u32_from_block(block, pos)
+        pos += 4
+
+    # Step 11: Read num_materials
+    num_materials = 0
+    if pos + 4 <= length:
+        num_materials = _read_u32_from_block(block, pos)
+        pos += 4
+
+    # Step 12: Read vertex positions (3 floats each = 12 bytes)
+    vert_data = []
+    for _ in range(num_vertices):
+        if pos + 12 <= length:
+            vx = struct.unpack_from('<f', block, pos)[0]
+            vy = struct.unpack_from('<f', block, pos + 4)[0]
+            vz = struct.unpack_from('<f', block, pos + 8)[0]
+            vert_data.append((vx, vy, vz))
+            pos += 12
+        else:
+            break
+
+    mesh.vertices = np.array(vert_data, dtype=np.float32) if vert_data else np.zeros((num_vertices, 3), dtype=np.float32)
+
+    # Step 13: Read normals (if indicated by flags)
+    has_normals = bool(flags & 0x8) or bool(flags & 0x10)
+    normals = []
+    if has_normals and num_vertices > 0:
+        for _ in range(num_vertices):
+            if pos + 12 <= length:
+                nx = struct.unpack_from('<f', block, pos)[0]
+                ny = struct.unpack_from('<f', block, pos + 4)[0]
+                nz = struct.unpack_from('<f', block, pos + 8)[0]
+                normals.append((nx, ny, nz))
+                pos += 12
+            else:
+                break
+        mesh.normals = np.array(normals, dtype=np.float32)
+    else:
+        # Skip normal data if present
+        expected_skip = num_vertices * 12
+        if pos + expected_skip <= length:
+            pos += expected_skip
+        mesh.normals = np.zeros((num_vertices, 3), dtype=np.float32)
+
+    # Step 14: Skip unknown data if present
+    if has_unknown and num_unknown > 0:
+        skip_size = num_unknown * 4
+        if pos + skip_size <= length:
+            pos += skip_size
+
+    # Step 15: Read UVs
+    uv_data = []
+    for _ in range(num_uvs):
+        if pos + 8 <= length:
+            u = struct.unpack_from('<f', block, pos)[0]
+            v = struct.unpack_from('<f', block, pos + 4)[0]
+            uv_data.append((u, v))
+            pos += 8
+        else:
+            break
+    mesh.uvs = np.array(uv_data, dtype=np.float32).reshape(-1, 2) if uv_data else np.zeros((num_uvs, 2), dtype=np.float32)
+
+    # Step 16: Read materials and faces
     material_ids = []
-    num_faces = 0
-    for _ in range(num_materials):
-        num_curr = reader.read_int()
-        num_faces += num_curr
-        mat_id = reader.read_int()
-        material_ids.append((mat_id, num_curr))
-    mesh.material_ids = material_ids
-
     faces = []
     uv_indices = []
+    num_faces = 0
+
+    for _ in range(num_materials):
+        if pos + 8 > length:
+            break
+        num_curr = struct.unpack_from('<i', block, pos)[0]
+        pos += 4
+        mat_id = struct.unpack_from('<i', block, pos)[0]
+        pos += 4
+        material_ids.append((mat_id, num_curr))
+        num_faces += num_curr
+
+    # Step 17: Read face indices
     for _ in range(num_faces):
-        face = reader.read_short(3)
-        faces.append(face)
-        uv_idx = reader.read_short(3)
-        uv_indices.append(uv_idx)
-        reader.read_short(2)
+        if pos + 6 > length:
+            break
+        v1 = struct.unpack_from('<h', block, pos)[0]
+        v2 = struct.unpack_from('<h', block, pos + 2)[0]
+        v3 = struct.unpack_from('<h', block, pos + 4)[0]
+        faces.append((v1, v2, v3))
+        pos += 6
 
-    mesh.faces = np.array(faces, dtype=np.int32).reshape(-1, 3)
-    mesh.uv_indices = np.array(uv_indices, dtype=np.int32).reshape(-1, 3)
+        # Read UV indices if available
+        if num_uvs > 0 and pos + 6 <= length:
+            u1 = struct.unpack_from('<h', block, pos)[0]
+            u2 = struct.unpack_from('<h', block, pos + 2)[0]
+            u3 = struct.unpack_from('<h', block, pos + 4)[0]
+            uv_indices.append((u1, u2, u3))
+            pos += 6
+        else:
+            # Skip 6 bytes (3 UV indices)
+            pos += 6
 
-    reader.read_int()
-    unknown = reader.read_int()
-    while unknown != 0:
-        amount = reader.read_int()
-        for _ in range(amount):
-            size = reader.read_short()
-            reader.read_short()
-            reader.read_short(2 * size)
-        unknown = reader.read_int()
-    reader.read_int()
+    mesh.faces = np.array(faces, dtype=np.int32).reshape(-1, 3) if faces else np.zeros((num_faces, 3), dtype=np.int32)
+    mesh.uv_indices = np.array(uv_indices, dtype=np.int32).reshape(-1, 3) if uv_indices else np.zeros((num_faces, 3), dtype=np.int32)
+    mesh.material_ids = material_ids
 
-    if has_second_mesh:
-        num_faces2 = 0
-        for _ in range(num_materials):
-            num_curr = reader.read_int()
-            num_faces2 += num_curr
-            reader.read_int()
-
-        size = reader.read_int()
-        reader.read_int()
-        num_vertices2 = reader.read_int()
-        block_length = reader.read_int()
-
-        for _ in range(num_vertices2):
-            reader.read_float(3)
-            if block_length >= 32:
-                reader.read_float(3)
-            if block_length >= 44:
-                reader.read_float(3)
-            if block_length >= 52:
-                reader.read_short(2)
-                reader.read_int()
-                reader.read_float(3)
-            if block_length >= 64:
-                reader.read_int()
-                reader.read_float(2)
-
-        size = reader.read_int()
-        face_data = reader.read_short(size // 2)
-        reader.read_int()
+    # Step 18: Handle second mesh if present
+    if has_second:
+        # Skip remaining data in block
+        if pos < length:
+            pos = length
 
     return mesh
 
@@ -317,6 +407,7 @@ def parse_texture_block(reader: BinaryReader, hash_id: str, is_second: bool) -> 
 def parse_wow(data: bytes) -> LevelData:
     level = LevelData()
 
+    # First, split on 99C0FFEE markers
     blocks = data.split(b'\x99\xC0\xFF\xEE')
 
     seen_textures = set()
@@ -326,30 +417,55 @@ def parse_wow(data: bytes) -> LevelData:
         if len(block) < 8:
             continue
 
+        # Parse mesh from block (starting after 99C0FFEE)
+        # The block data starts immediately, first u32 is header
+        if len(block) < 12:
+            continue
+
+        mesh = parse_mesh_from_block(block)
+        if mesh and mesh.hash_id and mesh.hash_id != "unknown" and len(mesh.vertices) > 0:
+            level.meshes[mesh.hash_id] = mesh
+
+        # Also try the old-style parsing for compatibility
         reader = BinaryReader(block)
 
-        hash_id = reader.read_hex()
-        type_id = reader.read_hex()
-
-        if hash_id == "000000B0":
+        # Read hash_id (u32)
+        try:
+            hash_id = reader.read_int()
+        except Exception:
             continue
-        elif hash_id == "0FF7C0DE":
+
+        # Read type_id (u32)
+        try:
+            type_id = reader.read_int()
+        except Exception:
+            continue
+
+        if hash_id == 0x000000B0:
+            continue
+        elif hash_id == 0x0FF7C0DE:
             break
 
-        if type_id == "776F772E":
+        # Check for ".wow" type (type_id = 0x776F772E)
+        if type_id == 0x776F772E:
+            # Already parsed above via parse_mesh_from_block
             continue
 
-        elif type_id == "6F61672E":
-            obj = parse_gao_block(reader, hash_id)
+        # Check for ".gao" type (type_id = 0x6F61672E)
+        elif type_id == 0x6F61672E:
+            obj = parse_gao_block(reader, f'{hash_id:08X}')
             if obj:
                 level.game_objects.append(obj)
 
-        elif type_id == "00000001":
-            mesh = parse_mesh_block(reader, hash_id)
+        elif type_id == 0x00000001:
+            # Standard mesh block - try old parser
+            # Reset reader position and try
+            reader.pos = 0
+            mesh = parse_mesh_block(reader, f'{hash_id:08X}')
             if mesh:
                 level.meshes[hash_id] = mesh
 
-        elif type_id == "00000004":
+        elif type_id == 0x00000004:
             if reader.end_of_stream():
                 continue
             if reader.read_int() != 0:
@@ -367,12 +483,12 @@ def parse_wow(data: bytes) -> LevelData:
             level.material_packs[hash_id] = mat_hashes
             reader.read_int()
 
-        elif type_id == "00000005":
-            mat = parse_material_block(reader, hash_id)
+        elif type_id == 0x00000005:
+            mat = parse_material_block(reader, f'{hash_id:08X}')
             if mat:
                 level.materials[hash_id] = mat
 
-        elif type_id == "0D0024F1":
+        elif type_id == 0x0D0024F1:
             extra_hashes[hash_id] = reader.read_hex()
             reader.read_int()
 

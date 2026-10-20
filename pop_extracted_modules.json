@@ -1,0 +1,2217 @@
+{
+  "binary": "POP.EXE",
+  "image_base": "0x400000",
+  "total_modules": 68,
+  "subsystems": {
+    "Core System & Miscellaneous": [
+      {
+        "path": "\\Libraries\\Sdk\\Sources\\INOut\\INOjoystick.c",
+        "file_offset": 3862900,
+        "virtual_address": 8057204,
+        "xrefs": [
+          {
+            "file_offset": "0x25038",
+            "code_va": "0x425038"
+          }
+        ],
+        "subsystem": "Core System & Miscellaneous"
+      },
+      {
+        "path": "\\Extern\\Base\\common\\src\\base\\memory\\allocator.cpp",
+        "file_offset": 3888836,
+        "virtual_address": 8083140,
+        "xrefs": [
+          {
+            "file_offset": "0x259ebd",
+            "code_va": "0x659ebd"
+          }
+        ],
+        "subsystem": "Core System & Miscellaneous"
+      },
+      {
+        "path": "\\Extern\\Base\\common\\src\\base\\memory\\poolallocator.cpp",
+        "file_offset": 3890676,
+        "virtual_address": 8084980,
+        "xrefs": [
+          {
+            "file_offset": "0x25cdfc",
+            "code_va": "0x65cdfc"
+          },
+          {
+            "file_offset": "0x25d1ee",
+            "code_va": "0x65d1ee"
+          }
+        ],
+        "subsystem": "Core System & Miscellaneous"
+      },
+      {
+        "path": "\\Extern\\Base\\common\\src\\base\\memory\\packedallocator.cpp",
+        "file_offset": 3891204,
+        "virtual_address": 8085508,
+        "xrefs": [
+          {
+            "file_offset": "0x25df0e",
+            "code_va": "0x65df0e"
+          }
+        ],
+        "subsystem": "Core System & Miscellaneous"
+      },
+      {
+        "path": "\\Extern\\Base\\common\\src\\base\\memory\\hybridallocator.cpp",
+        "file_offset": 3891348,
+        "virtual_address": 8085652,
+        "xrefs": [
+          {
+            "file_offset": "0x25e87e",
+            "code_va": "0x65e87e"
+          }
+        ],
+        "subsystem": "Core System & Miscellaneous"
+      },
+      {
+        "path": "\\Extern\\Base\\common\\src\\base\\memory\\poolallocatorpage.cpp",
+        "file_offset": 3892756,
+        "virtual_address": 8087060,
+        "xrefs": [
+          {
+            "file_offset": "0x2638e7",
+            "code_va": "0x6638e7"
+          }
+        ],
+        "subsystem": "Core System & Miscellaneous"
+      },
+      {
+        "path": "\\Extern\\Base\\common\\src\\base\\memory\\metapage.cpp",
+        "file_offset": 3893276,
+        "virtual_address": 8087580,
+        "xrefs": [
+          {
+            "file_offset": "0x2654fd",
+            "code_va": "0x6654fd"
+          }
+        ],
+        "subsystem": "Core System & Miscellaneous"
+      },
+      {
+        "path": ".\\Source\\PCGraphics.cpp",
+        "file_offset": 3893350,
+        "virtual_address": 8087654,
+        "xrefs": [],
+        "subsystem": "Core System & Miscellaneous"
+      },
+      {
+        "path": ".\\Source\\ShadowMgr.cpp",
+        "file_offset": 3894846,
+        "virtual_address": 8089150,
+        "xrefs": [],
+        "subsystem": "Core System & Miscellaneous"
+      },
+      {
+        "path": "\\Libraries\\ENGine\\Sources\\DynamicLoading\\cLoader.cpp",
+        "file_offset": 3901548,
+        "virtual_address": 8095852,
+        "xrefs": [
+          {
+            "file_offset": "0x27dc14",
+            "code_va": "0x67dc14"
+          },
+          {
+            "file_offset": "0x27dd59",
+            "code_va": "0x67dd59"
+          }
+        ],
+        "subsystem": "Core System & Miscellaneous"
+      },
+      {
+        "path": "\\Libraries\\ENGine\\Sources\\WORld\\WORDynLoad.c",
+        "file_offset": 3901724,
+        "virtual_address": 8096028,
+        "xrefs": [
+          {
+            "file_offset": "0x2800cd",
+            "code_va": "0x6800cd"
+          }
+        ],
+        "subsystem": "Core System & Miscellaneous"
+      }
+    ],
+    "Jade BigFile Archive Subsystem (BIG)": [
+      {
+        "path": "\\Libraries\\Sdk\\Sources\\BIGfiles\\BIGopen.c",
+        "file_offset": 3862984,
+        "virtual_address": 8057288,
+        "xrefs": [
+          {
+            "file_offset": "0x25a2f",
+            "code_va": "0x425a2f"
+          },
+          {
+            "file_offset": "0x25b9e",
+            "code_va": "0x425b9e"
+          }
+        ],
+        "subsystem": "Jade BigFile Archive Subsystem (BIG)"
+      },
+      {
+        "path": "\\Libraries\\Sdk\\Sources\\BIGfiles\\LOAding\\LOAdefs.c",
+        "file_offset": 3863172,
+        "virtual_address": 8057476,
+        "xrefs": [
+          {
+            "file_offset": "0x263da",
+            "code_va": "0x4263da"
+          }
+        ],
+        "subsystem": "Jade BigFile Archive Subsystem (BIG)"
+      },
+      {
+        "path": "\\Libraries\\Sdk\\Sources\\BIGfiles\\BIGread.c",
+        "file_offset": 3864552,
+        "virtual_address": 8058856,
+        "xrefs": [
+          {
+            "file_offset": "0x28197",
+            "code_va": "0x428197"
+          },
+          {
+            "file_offset": "0x281d3",
+            "code_va": "0x4281d3"
+          },
+          {
+            "file_offset": "0x28275",
+            "code_va": "0x428275"
+          },
+          {
+            "file_offset": "0x282c1",
+            "code_va": "0x4282c1"
+          },
+          {
+            "file_offset": "0x2837f",
+            "code_va": "0x42837f"
+          },
+          {
+            "file_offset": "0x283bc",
+            "code_va": "0x4283bc"
+          },
+          {
+            "file_offset": "0x28453",
+            "code_va": "0x428453"
+          },
+          {
+            "file_offset": "0x2848d",
+            "code_va": "0x42848d"
+          },
+          {
+            "file_offset": "0x285a7",
+            "code_va": "0x4285a7"
+          },
+          {
+            "file_offset": "0x285e8",
+            "code_va": "0x4285e8"
+          },
+          {
+            "file_offset": "0x28680",
+            "code_va": "0x428680"
+          },
+          {
+            "file_offset": "0x286bb",
+            "code_va": "0x4286bb"
+          }
+        ],
+        "subsystem": "Jade BigFile Archive Subsystem (BIG)"
+      },
+      {
+        "path": "\\Libraries\\Sdk\\Sources\\BIGfiles\\BIGfat.c",
+        "file_offset": 3865000,
+        "virtual_address": 8059304,
+        "xrefs": [
+          {
+            "file_offset": "0x287f1",
+            "code_va": "0x4287f1"
+          },
+          {
+            "file_offset": "0x28ab0",
+            "code_va": "0x428ab0"
+          },
+          {
+            "file_offset": "0x28b0c",
+            "code_va": "0x428b0c"
+          },
+          {
+            "file_offset": "0x28b71",
+            "code_va": "0x428b71"
+          },
+          {
+            "file_offset": "0x28cb6",
+            "code_va": "0x428cb6"
+          },
+          {
+            "file_offset": "0x28d07",
+            "code_va": "0x428d07"
+          },
+          {
+            "file_offset": "0x28f0a",
+            "code_va": "0x428f0a"
+          }
+        ],
+        "subsystem": "Jade BigFile Archive Subsystem (BIG)"
+      },
+      {
+        "path": "\\Libraries\\Sdk\\Sources\\BIGfiles\\BIGio.c",
+        "file_offset": 3865792,
+        "virtual_address": 8060096,
+        "xrefs": [
+          {
+            "file_offset": "0x29344",
+            "code_va": "0x429344"
+          },
+          {
+            "file_offset": "0x293ac",
+            "code_va": "0x4293ac"
+          },
+          {
+            "file_offset": "0x294c8",
+            "code_va": "0x4294c8"
+          }
+        ],
+        "subsystem": "Jade BigFile Archive Subsystem (BIG)"
+      },
+      {
+        "path": "\\Libraries\\Sdk\\Sources\\BIGfiles\\BIGcomp.c",
+        "file_offset": 3866024,
+        "virtual_address": 8060328,
+        "xrefs": [
+          {
+            "file_offset": "0x2ae0e",
+            "code_va": "0x42ae0e"
+          },
+          {
+            "file_offset": "0x2afde",
+            "code_va": "0x42afde"
+          },
+          {
+            "file_offset": "0x2b071",
+            "code_va": "0x42b071"
+          }
+        ],
+        "subsystem": "Jade BigFile Archive Subsystem (BIG)"
+      },
+      {
+        "path": "\\Libraries\\Sdk\\Sources\\PackFiles\\bigfile.cpp",
+        "file_offset": 4122456,
+        "virtual_address": 8316760,
+        "xrefs": [
+          {
+            "file_offset": "0x3a601c",
+            "code_va": "0x7a601c"
+          }
+        ],
+        "subsystem": "Jade BigFile Archive Subsystem (BIG)"
+      }
+    ],
+    "Jade AI Scripting & Virtual Machine (AI)": [
+      {
+        "path": "\\Libraries\\AIinterp\\Sources\\AIload.c",
+        "file_offset": 3867640,
+        "virtual_address": 8061944,
+        "xrefs": [
+          {
+            "file_offset": "0x655bd",
+            "code_va": "0x4655bd"
+          },
+          {
+            "file_offset": "0x6562a",
+            "code_va": "0x46562a"
+          },
+          {
+            "file_offset": "0x669f1",
+            "code_va": "0x4669f1"
+          },
+          {
+            "file_offset": "0x66f8e",
+            "code_va": "0x466f8e"
+          },
+          {
+            "file_offset": "0x6704a",
+            "code_va": "0x46704a"
+          }
+        ],
+        "subsystem": "Jade AI Scripting & Virtual Machine (AI)"
+      },
+      {
+        "path": "\\Libraries\\AIinterp\\Sources\\AIengine.c",
+        "file_offset": 3868376,
+        "virtual_address": 8062680,
+        "xrefs": [
+          {
+            "file_offset": "0x68f4f",
+            "code_va": "0x468f4f"
+          },
+          {
+            "file_offset": "0x695ad",
+            "code_va": "0x4695ad"
+          },
+          {
+            "file_offset": "0x695ea",
+            "code_va": "0x4695ea"
+          }
+        ],
+        "subsystem": "Jade AI Scripting & Virtual Machine (AI)"
+      },
+      {
+        "path": "\\Libraries\\AIinterp\\Sources\\AIfactory.c",
+        "file_offset": 3868672,
+        "virtual_address": 8062976,
+        "xrefs": [
+          {
+            "file_offset": "0x69c2d",
+            "code_va": "0x469c2d"
+          },
+          {
+            "file_offset": "0x69c55",
+            "code_va": "0x469c55"
+          },
+          {
+            "file_offset": "0x69c9d",
+            "code_va": "0x469c9d"
+          },
+          {
+            "file_offset": "0x69cc5",
+            "code_va": "0x469cc5"
+          },
+          {
+            "file_offset": "0x69d0c",
+            "code_va": "0x469d0c"
+          },
+          {
+            "file_offset": "0x69d4d",
+            "code_va": "0x469d4d"
+          },
+          {
+            "file_offset": "0x69d7b",
+            "code_va": "0x469d7b"
+          },
+          {
+            "file_offset": "0x69dbd",
+            "code_va": "0x469dbd"
+          },
+          {
+            "file_offset": "0x69deb",
+            "code_va": "0x469deb"
+          },
+          {
+            "file_offset": "0x69e2d",
+            "code_va": "0x469e2d"
+          },
+          {
+            "file_offset": "0x69e55",
+            "code_va": "0x469e55"
+          },
+          {
+            "file_offset": "0x69e7c",
+            "code_va": "0x469e7c"
+          },
+          {
+            "file_offset": "0x69ebd",
+            "code_va": "0x469ebd"
+          },
+          {
+            "file_offset": "0x69ee5",
+            "code_va": "0x469ee5"
+          },
+          {
+            "file_offset": "0x69f0c",
+            "code_va": "0x469f0c"
+          },
+          {
+            "file_offset": "0x69f4c",
+            "code_va": "0x469f4c"
+          },
+          {
+            "file_offset": "0x69f73",
+            "code_va": "0x469f73"
+          },
+          {
+            "file_offset": "0x69fad",
+            "code_va": "0x469fad"
+          },
+          {
+            "file_offset": "0x69fdb",
+            "code_va": "0x469fdb"
+          },
+          {
+            "file_offset": "0x6a00d",
+            "code_va": "0x46a00d"
+          },
+          {
+            "file_offset": "0x6a03b",
+            "code_va": "0x46a03b"
+          },
+          {
+            "file_offset": "0x6ab3e",
+            "code_va": "0x46ab3e"
+          },
+          {
+            "file_offset": "0x6ab7e",
+            "code_va": "0x46ab7e"
+          }
+        ],
+        "subsystem": "Jade AI Scripting & Virtual Machine (AI)"
+      },
+      {
+        "path": "\\Libraries\\AIinterp\\Sources\\Functions\\AIfunctions_fact.c",
+        "file_offset": 3869132,
+        "virtual_address": 8063436,
+        "xrefs": [
+          {
+            "file_offset": "0x6ebd5",
+            "code_va": "0x46ebd5"
+          },
+          {
+            "file_offset": "0x6ec75",
+            "code_va": "0x46ec75"
+          },
+          {
+            "file_offset": "0x6ed15",
+            "code_va": "0x46ed15"
+          },
+          {
+            "file_offset": "0x6ede5",
+            "code_va": "0x46ede5"
+          },
+          {
+            "file_offset": "0x6eed8",
+            "code_va": "0x46eed8"
+          },
+          {
+            "file_offset": "0x6efc8",
+            "code_va": "0x46efc8"
+          },
+          {
+            "file_offset": "0x6f088",
+            "code_va": "0x46f088"
+          },
+          {
+            "file_offset": "0x6f148",
+            "code_va": "0x46f148"
+          },
+          {
+            "file_offset": "0x6f1e8",
+            "code_va": "0x46f1e8"
+          },
+          {
+            "file_offset": "0x6f2d8",
+            "code_va": "0x46f2d8"
+          }
+        ],
+        "subsystem": "Jade AI Scripting & Virtual Machine (AI)"
+      },
+      {
+        "path": "\\Libraries\\AIinterp\\Sources\\Functions\\AIfunctions_grid.c",
+        "file_offset": 3869468,
+        "virtual_address": 8063772,
+        "xrefs": [
+          {
+            "file_offset": "0x87dd5",
+            "code_va": "0x487dd5"
+          },
+          {
+            "file_offset": "0x87ea1",
+            "code_va": "0x487ea1"
+          },
+          {
+            "file_offset": "0x87ef8",
+            "code_va": "0x487ef8"
+          },
+          {
+            "file_offset": "0x87fc4",
+            "code_va": "0x487fc4"
+          },
+          {
+            "file_offset": "0x88018",
+            "code_va": "0x488018"
+          },
+          {
+            "file_offset": "0x880b8",
+            "code_va": "0x4880b8"
+          },
+          {
+            "file_offset": "0x88156",
+            "code_va": "0x488156"
+          },
+          {
+            "file_offset": "0x8817a",
+            "code_va": "0x48817a"
+          },
+          {
+            "file_offset": "0x8840a",
+            "code_va": "0x48840a"
+          },
+          {
+            "file_offset": "0x8855e",
+            "code_va": "0x48855e"
+          },
+          {
+            "file_offset": "0x8866b",
+            "code_va": "0x48866b"
+          },
+          {
+            "file_offset": "0x88813",
+            "code_va": "0x488813"
+          },
+          {
+            "file_offset": "0x888a8",
+            "code_va": "0x4888a8"
+          },
+          {
+            "file_offset": "0x88997",
+            "code_va": "0x488997"
+          },
+          {
+            "file_offset": "0x88b09",
+            "code_va": "0x488b09"
+          },
+          {
+            "file_offset": "0x88c65",
+            "code_va": "0x488c65"
+          },
+          {
+            "file_offset": "0x88d0d",
+            "code_va": "0x488d0d"
+          },
+          {
+            "file_offset": "0x88d31",
+            "code_va": "0x488d31"
+          },
+          {
+            "file_offset": "0x88e61",
+            "code_va": "0x488e61"
+          },
+          {
+            "file_offset": "0x88f3a",
+            "code_va": "0x488f3a"
+          }
+        ],
+        "subsystem": "Jade AI Scripting & Virtual Machine (AI)"
+      },
+      {
+        "path": "\\Libraries\\AIinterp\\Sources\\Functions\\AIfunctions_wor.c",
+        "file_offset": 3869664,
+        "virtual_address": 8063968,
+        "xrefs": [
+          {
+            "file_offset": "0x9cd6d",
+            "code_va": "0x49cd6d"
+          },
+          {
+            "file_offset": "0x9d739",
+            "code_va": "0x49d739"
+          }
+        ],
+        "subsystem": "Jade AI Scripting & Virtual Machine (AI)"
+      },
+      {
+        "path": "\\Libraries\\AIinterp\\Sources\\Keywords\\AIkeywords.c",
+        "file_offset": 3870084,
+        "virtual_address": 8064388,
+        "xrefs": [
+          {
+            "file_offset": "0xa455a",
+            "code_va": "0x4a455a"
+          },
+          {
+            "file_offset": "0x390038",
+            "code_va": "0x790038"
+          }
+        ],
+        "subsystem": "Jade AI Scripting & Virtual Machine (AI)"
+      },
+      {
+        "path": "\\Libraries\\AIinterp\\Sources\\Categs\\AIcateg.c",
+        "file_offset": 3870196,
+        "virtual_address": 8064500,
+        "xrefs": [
+          {
+            "file_offset": "0xa7987",
+            "code_va": "0x4a7987"
+          },
+          {
+            "file_offset": "0xa80bc",
+            "code_va": "0x4a80bc"
+          }
+        ],
+        "subsystem": "Jade AI Scripting & Virtual Machine (AI)"
+      },
+      {
+        "path": "\\Libraries\\AIinterp\\Sources\\Events\\EVEplay.c",
+        "file_offset": 3887540,
+        "virtual_address": 8081844,
+        "xrefs": [
+          {
+            "file_offset": "0x24b5eb",
+            "code_va": "0x64b5eb"
+          },
+          {
+            "file_offset": "0x24b613",
+            "code_va": "0x64b613"
+          }
+        ],
+        "subsystem": "Jade AI Scripting & Virtual Machine (AI)"
+      },
+      {
+        "path": "\\Libraries\\AIinterp\\Sources\\Events\\EVEinit.c",
+        "file_offset": 3887724,
+        "virtual_address": 8082028,
+        "xrefs": [
+          {
+            "file_offset": "0x24bf9a",
+            "code_va": "0x64bf9a"
+          },
+          {
+            "file_offset": "0x24bfd7",
+            "code_va": "0x64bfd7"
+          }
+        ],
+        "subsystem": "Jade AI Scripting & Virtual Machine (AI)"
+      }
+    ],
+    "Jade Graphics & Texture Subsystem (GRO/TEX)": [
+      {
+        "path": ".\\Source\\PCTextureMgr.cpp",
+        "file_offset": 3894544,
+        "virtual_address": 8088848,
+        "xrefs": [
+          {
+            "file_offset": "0x26b096",
+            "code_va": "0x66b096"
+          }
+        ],
+        "subsystem": "Jade Graphics & Texture Subsystem (GRO/TEX)"
+      }
+    ],
+    "Jade GameObject & Transform Pipeline (OBJ)": [
+      {
+        "path": "\\Libraries\\ENGine\\Sources\\OBJects\\OBJload.c",
+        "file_offset": 3901968,
+        "virtual_address": 8096272,
+        "xrefs": [
+          {
+            "file_offset": "0x284a1a",
+            "code_va": "0x684a1a"
+          }
+        ],
+        "subsystem": "Jade GameObject & Transform Pipeline (OBJ)"
+      },
+      {
+        "path": "\\Libraries\\ENGine\\Sources\\OBJects\\OBJBoundingvolume.c",
+        "file_offset": 3902408,
+        "virtual_address": 8096712,
+        "xrefs": [
+          {
+            "file_offset": "0x298161",
+            "code_va": "0x698161"
+          },
+          {
+            "file_offset": "0x2981aa",
+            "code_va": "0x6981aa"
+          },
+          {
+            "file_offset": "0x29820d",
+            "code_va": "0x69820d"
+          },
+          {
+            "file_offset": "0x298268",
+            "code_va": "0x698268"
+          },
+          {
+            "file_offset": "0x29870c",
+            "code_va": "0x69870c"
+          },
+          {
+            "file_offset": "0x298762",
+            "code_va": "0x698762"
+          },
+          {
+            "file_offset": "0x29877b",
+            "code_va": "0x69877b"
+          },
+          {
+            "file_offset": "0x298794",
+            "code_va": "0x698794"
+          },
+          {
+            "file_offset": "0x2987ad",
+            "code_va": "0x6987ad"
+          },
+          {
+            "file_offset": "0x298803",
+            "code_va": "0x698803"
+          },
+          {
+            "file_offset": "0x29881c",
+            "code_va": "0x69881c"
+          },
+          {
+            "file_offset": "0x298835",
+            "code_va": "0x698835"
+          },
+          {
+            "file_offset": "0x29884e",
+            "code_va": "0x69884e"
+          },
+          {
+            "file_offset": "0x2988a8",
+            "code_va": "0x6988a8"
+          },
+          {
+            "file_offset": "0x2988c3",
+            "code_va": "0x6988c3"
+          }
+        ],
+        "subsystem": "Jade GameObject & Transform Pipeline (OBJ)"
+      },
+      {
+        "path": "\\Libraries\\ENGine\\Sources\\MoDiFier\\MDFmodifier_GEN.c",
+        "file_offset": 3904252,
+        "virtual_address": 8098556,
+        "xrefs": [
+          {
+            "file_offset": "0x2e95f1",
+            "code_va": "0x6e95f1"
+          }
+        ],
+        "subsystem": "Jade GameObject & Transform Pipeline (OBJ)"
+      },
+      {
+        "path": "\\Libraries\\ENGine\\Sources\\MoDiFier\\Rope2D.cpp",
+        "file_offset": 3904476,
+        "virtual_address": 8098780,
+        "xrefs": [
+          {
+            "file_offset": "0x2eed99",
+            "code_va": "0x6eed99"
+          }
+        ],
+        "subsystem": "Jade GameObject & Transform Pipeline (OBJ)"
+      }
+    ],
+    "Jade Spatial Partitioning & Culling (GRI)": [
+      {
+        "path": "\\Libraries\\ENGine\\Sources\\GRId\\GRI_compute.c",
+        "file_offset": 3903380,
+        "virtual_address": 8097684,
+        "xrefs": [
+          {
+            "file_offset": "0x2c60ba",
+            "code_va": "0x6c60ba"
+          }
+        ],
+        "subsystem": "Jade Spatial Partitioning & Culling (GRI)"
+      },
+      {
+        "path": "\\Libraries\\ENGine\\Sources\\GRId\\GRI_load.c",
+        "file_offset": 3903808,
+        "virtual_address": 8098112,
+        "xrefs": [
+          {
+            "file_offset": "0x2daf50",
+            "code_va": "0x6daf50"
+          },
+          {
+            "file_offset": "0x2daf80",
+            "code_va": "0x6daf80"
+          },
+          {
+            "file_offset": "0x2dafed",
+            "code_va": "0x6dafed"
+          },
+          {
+            "file_offset": "0x2db147",
+            "code_va": "0x6db147"
+          },
+          {
+            "file_offset": "0x2dbab8",
+            "code_va": "0x6dbab8"
+          }
+        ],
+        "subsystem": "Jade Spatial Partitioning & Culling (GRI)"
+      }
+    ],
+    "Jade Physics & Collision Subsystem (COL)": [
+      {
+        "path": "\\Libraries\\ENGine\\Sources\\COLlision\\COLcob.c",
+        "file_offset": 3903516,
+        "virtual_address": 8097820,
+        "xrefs": [
+          {
+            "file_offset": "0x2cb715",
+            "code_va": "0x6cb715"
+          }
+        ],
+        "subsystem": "Jade Physics & Collision Subsystem (COL)"
+      }
+    ],
+    "Ubisoft DARE 3D Audio Engine": [
+      {
+        "path": "\\Extern\\Dare\\engine\\common\\src\\sndldbin.c",
+        "file_offset": 3905420,
+        "virtual_address": 8099724,
+        "xrefs": [
+          {
+            "file_offset": "0x2f0431",
+            "code_va": "0x6f0431"
+          },
+          {
+            "file_offset": "0x2f097b",
+            "code_va": "0x6f097b"
+          },
+          {
+            "file_offset": "0x2f0beb",
+            "code_va": "0x6f0beb"
+          }
+        ],
+        "subsystem": "Ubisoft DARE 3D Audio Engine"
+      },
+      {
+        "path": "\\Extern\\Dare\\engine\\common\\src\\sound3d.c",
+        "file_offset": 3906352,
+        "virtual_address": 8100656,
+        "xrefs": [
+          {
+            "file_offset": "0x2f339c",
+            "code_va": "0x6f339c"
+          },
+          {
+            "file_offset": "0x2f341e",
+            "code_va": "0x6f341e"
+          },
+          {
+            "file_offset": "0x2f36a0",
+            "code_va": "0x6f36a0"
+          },
+          {
+            "file_offset": "0x2f370b",
+            "code_va": "0x6f370b"
+          },
+          {
+            "file_offset": "0x2f379c",
+            "code_va": "0x6f379c"
+          },
+          {
+            "file_offset": "0x2f37fb",
+            "code_va": "0x6f37fb"
+          },
+          {
+            "file_offset": "0x2f383d",
+            "code_va": "0x6f383d"
+          },
+          {
+            "file_offset": "0x2f387d",
+            "code_va": "0x6f387d"
+          },
+          {
+            "file_offset": "0x2f392f",
+            "code_va": "0x6f392f"
+          },
+          {
+            "file_offset": "0x2f3a0b",
+            "code_va": "0x6f3a0b"
+          },
+          {
+            "file_offset": "0x2f3abd",
+            "code_va": "0x6f3abd"
+          },
+          {
+            "file_offset": "0x2f3b5b",
+            "code_va": "0x6f3b5b"
+          },
+          {
+            "file_offset": "0x2f3b8d",
+            "code_va": "0x6f3b8d"
+          },
+          {
+            "file_offset": "0x2f3c3f",
+            "code_va": "0x6f3c3f"
+          },
+          {
+            "file_offset": "0x2f3d9c",
+            "code_va": "0x6f3d9c"
+          },
+          {
+            "file_offset": "0x2f3e6c",
+            "code_va": "0x6f3e6c"
+          },
+          {
+            "file_offset": "0x2f3f05",
+            "code_va": "0x6f3f05"
+          },
+          {
+            "file_offset": "0x2f3f65",
+            "code_va": "0x6f3f65"
+          },
+          {
+            "file_offset": "0x2f3fc5",
+            "code_va": "0x6f3fc5"
+          },
+          {
+            "file_offset": "0x2f4015",
+            "code_va": "0x6f4015"
+          },
+          {
+            "file_offset": "0x2f4065",
+            "code_va": "0x6f4065"
+          },
+          {
+            "file_offset": "0x2f40b5",
+            "code_va": "0x6f40b5"
+          },
+          {
+            "file_offset": "0x2f4105",
+            "code_va": "0x6f4105"
+          },
+          {
+            "file_offset": "0x2f414b",
+            "code_va": "0x6f414b"
+          },
+          {
+            "file_offset": "0x2f41bb",
+            "code_va": "0x6f41bb"
+          },
+          {
+            "file_offset": "0x2f425a",
+            "code_va": "0x6f425a"
+          },
+          {
+            "file_offset": "0x2f4d59",
+            "code_va": "0x6f4d59"
+          },
+          {
+            "file_offset": "0x2f4f47",
+            "code_va": "0x6f4f47"
+          },
+          {
+            "file_offset": "0x2f4feb",
+            "code_va": "0x6f4feb"
+          },
+          {
+            "file_offset": "0x2f526c",
+            "code_va": "0x6f526c"
+          },
+          {
+            "file_offset": "0x2f52ab",
+            "code_va": "0x6f52ab"
+          },
+          {
+            "file_offset": "0x2f52ee",
+            "code_va": "0x6f52ee"
+          }
+        ],
+        "subsystem": "Ubisoft DARE 3D Audio Engine"
+      },
+      {
+        "path": "\\Extern\\Dare\\engine\\common\\src\\sndldmap.c",
+        "file_offset": 3909116,
+        "virtual_address": 8103420,
+        "xrefs": [
+          {
+            "file_offset": "0x2f6ebc",
+            "code_va": "0x6f6ebc"
+          }
+        ],
+        "subsystem": "Ubisoft DARE 3D Audio Engine"
+      },
+      {
+        "path": "\\Extern\\Dare\\engine\\common\\src\\sndldbnk.c",
+        "file_offset": 3909264,
+        "virtual_address": 8103568,
+        "xrefs": [
+          {
+            "file_offset": "0x2f72fe",
+            "code_va": "0x6f72fe"
+          },
+          {
+            "file_offset": "0x2f739e",
+            "code_va": "0x6f739e"
+          },
+          {
+            "file_offset": "0x2f7430",
+            "code_va": "0x6f7430"
+          },
+          {
+            "file_offset": "0x2f758e",
+            "code_va": "0x6f758e"
+          },
+          {
+            "file_offset": "0x2f765b",
+            "code_va": "0x6f765b"
+          },
+          {
+            "file_offset": "0x2f76a3",
+            "code_va": "0x6f76a3"
+          },
+          {
+            "file_offset": "0x2f78ac",
+            "code_va": "0x6f78ac"
+          },
+          {
+            "file_offset": "0x2f7adc",
+            "code_va": "0x6f7adc"
+          },
+          {
+            "file_offset": "0x2f7bc3",
+            "code_va": "0x6f7bc3"
+          },
+          {
+            "file_offset": "0x2f7d3e",
+            "code_va": "0x6f7d3e"
+          },
+          {
+            "file_offset": "0x2f810b",
+            "code_va": "0x6f810b"
+          },
+          {
+            "file_offset": "0x2f832c",
+            "code_va": "0x6f832c"
+          },
+          {
+            "file_offset": "0x2f83cb",
+            "code_va": "0x6f83cb"
+          }
+        ],
+        "subsystem": "Ubisoft DARE 3D Audio Engine"
+      },
+      {
+        "path": "\\Extern\\Dare\\engine\\common\\src\\snddata.c",
+        "file_offset": 3909700,
+        "virtual_address": 8104004,
+        "xrefs": [
+          {
+            "file_offset": "0x2f87ed",
+            "code_va": "0x6f87ed"
+          },
+          {
+            "file_offset": "0x2f8846",
+            "code_va": "0x6f8846"
+          },
+          {
+            "file_offset": "0x2f8896",
+            "code_va": "0x6f8896"
+          },
+          {
+            "file_offset": "0x2f88fc",
+            "code_va": "0x6f88fc"
+          },
+          {
+            "file_offset": "0x2f89dc",
+            "code_va": "0x6f89dc"
+          },
+          {
+            "file_offset": "0x2f8aac",
+            "code_va": "0x6f8aac"
+          },
+          {
+            "file_offset": "0x2f8aeb",
+            "code_va": "0x6f8aeb"
+          },
+          {
+            "file_offset": "0x2f8fdd",
+            "code_va": "0x6f8fdd"
+          },
+          {
+            "file_offset": "0x2f926c",
+            "code_va": "0x6f926c"
+          },
+          {
+            "file_offset": "0x2f980a",
+            "code_va": "0x6f980a"
+          }
+        ],
+        "subsystem": "Ubisoft DARE 3D Audio Engine"
+      },
+      {
+        "path": "\\Extern\\Dare\\engine\\common\\src\\ToolArch\\Renderers\\RDSound3D\\RDSound3D.cpp",
+        "file_offset": 3914368,
+        "virtual_address": 8108672,
+        "xrefs": [
+          {
+            "file_offset": "0x2fd244",
+            "code_va": "0x6fd244"
+          }
+        ],
+        "subsystem": "Ubisoft DARE 3D Audio Engine"
+      },
+      {
+        "path": "\\Extern\\Dare\\engine\\common\\src\\ToolArch\\sndxdtool.cpp",
+        "file_offset": 3914456,
+        "virtual_address": 8108760,
+        "xrefs": [
+          {
+            "file_offset": "0x2fd839",
+            "code_va": "0x6fd839"
+          },
+          {
+            "file_offset": "0x2fd888",
+            "code_va": "0x6fd888"
+          },
+          {
+            "file_offset": "0x2fd8c2",
+            "code_va": "0x6fd8c2"
+          },
+          {
+            "file_offset": "0x2fd902",
+            "code_va": "0x6fd902"
+          },
+          {
+            "file_offset": "0x2fd965",
+            "code_va": "0x6fd965"
+          },
+          {
+            "file_offset": "0x2fd9ab",
+            "code_va": "0x6fd9ab"
+          },
+          {
+            "file_offset": "0x2fd9db",
+            "code_va": "0x6fd9db"
+          },
+          {
+            "file_offset": "0x2fda0b",
+            "code_va": "0x6fda0b"
+          },
+          {
+            "file_offset": "0x2fda45",
+            "code_va": "0x6fda45"
+          },
+          {
+            "file_offset": "0x2fda85",
+            "code_va": "0x6fda85"
+          },
+          {
+            "file_offset": "0x2fdb1b",
+            "code_va": "0x6fdb1b"
+          },
+          {
+            "file_offset": "0x2fdb4b",
+            "code_va": "0x6fdb4b"
+          },
+          {
+            "file_offset": "0x2fdb85",
+            "code_va": "0x6fdb85"
+          },
+          {
+            "file_offset": "0x2fdbbb",
+            "code_va": "0x6fdbbb"
+          },
+          {
+            "file_offset": "0x2fdc19",
+            "code_va": "0x6fdc19"
+          },
+          {
+            "file_offset": "0x2fdc68",
+            "code_va": "0x6fdc68"
+          },
+          {
+            "file_offset": "0x2fdcb2",
+            "code_va": "0x6fdcb2"
+          },
+          {
+            "file_offset": "0x2fdce5",
+            "code_va": "0x6fdce5"
+          },
+          {
+            "file_offset": "0x2fdd1c",
+            "code_va": "0x6fdd1c"
+          },
+          {
+            "file_offset": "0x2fdd4b",
+            "code_va": "0x6fdd4b"
+          },
+          {
+            "file_offset": "0x2fdd7b",
+            "code_va": "0x6fdd7b"
+          },
+          {
+            "file_offset": "0x2fddab",
+            "code_va": "0x6fddab"
+          },
+          {
+            "file_offset": "0x2fdde5",
+            "code_va": "0x6fdde5"
+          },
+          {
+            "file_offset": "0x2fde45",
+            "code_va": "0x6fde45"
+          },
+          {
+            "file_offset": "0x2fde95",
+            "code_va": "0x6fde95"
+          },
+          {
+            "file_offset": "0x2fded5",
+            "code_va": "0x6fded5"
+          },
+          {
+            "file_offset": "0x2fdf1b",
+            "code_va": "0x6fdf1b"
+          },
+          {
+            "file_offset": "0x2fdf6b",
+            "code_va": "0x6fdf6b"
+          },
+          {
+            "file_offset": "0x2fdf9b",
+            "code_va": "0x6fdf9b"
+          },
+          {
+            "file_offset": "0x2fdfcb",
+            "code_va": "0x6fdfcb"
+          },
+          {
+            "file_offset": "0x2fdffb",
+            "code_va": "0x6fdffb"
+          },
+          {
+            "file_offset": "0x2fe02b",
+            "code_va": "0x6fe02b"
+          },
+          {
+            "file_offset": "0x2fe075",
+            "code_va": "0x6fe075"
+          },
+          {
+            "file_offset": "0x2fe0db",
+            "code_va": "0x6fe0db"
+          },
+          {
+            "file_offset": "0x2fe10b",
+            "code_va": "0x6fe10b"
+          },
+          {
+            "file_offset": "0x2fe13b",
+            "code_va": "0x6fe13b"
+          },
+          {
+            "file_offset": "0x2fe175",
+            "code_va": "0x6fe175"
+          },
+          {
+            "file_offset": "0x2fe1b5",
+            "code_va": "0x6fe1b5"
+          },
+          {
+            "file_offset": "0x2fe205",
+            "code_va": "0x6fe205"
+          },
+          {
+            "file_offset": "0x2fe245",
+            "code_va": "0x6fe245"
+          },
+          {
+            "file_offset": "0x2fe29b",
+            "code_va": "0x6fe29b"
+          },
+          {
+            "file_offset": "0x2fe2cb",
+            "code_va": "0x6fe2cb"
+          },
+          {
+            "file_offset": "0x2fe2fb",
+            "code_va": "0x6fe2fb"
+          },
+          {
+            "file_offset": "0x2fe335",
+            "code_va": "0x6fe335"
+          },
+          {
+            "file_offset": "0x2fe375",
+            "code_va": "0x6fe375"
+          },
+          {
+            "file_offset": "0x2fe3c5",
+            "code_va": "0x6fe3c5"
+          },
+          {
+            "file_offset": "0x2fe3fb",
+            "code_va": "0x6fe3fb"
+          },
+          {
+            "file_offset": "0x2fe44c",
+            "code_va": "0x6fe44c"
+          },
+          {
+            "file_offset": "0x2fe47c",
+            "code_va": "0x6fe47c"
+          },
+          {
+            "file_offset": "0x2fe4ac",
+            "code_va": "0x6fe4ac"
+          },
+          {
+            "file_offset": "0x2fe4dc",
+            "code_va": "0x6fe4dc"
+          },
+          {
+            "file_offset": "0x2fe50c",
+            "code_va": "0x6fe50c"
+          },
+          {
+            "file_offset": "0x2fe53c",
+            "code_va": "0x6fe53c"
+          },
+          {
+            "file_offset": "0x2fe575",
+            "code_va": "0x6fe575"
+          },
+          {
+            "file_offset": "0x2fe5ab",
+            "code_va": "0x6fe5ab"
+          },
+          {
+            "file_offset": "0x2fe5e5",
+            "code_va": "0x6fe5e5"
+          },
+          {
+            "file_offset": "0x2fe625",
+            "code_va": "0x6fe625"
+          }
+        ],
+        "subsystem": "Ubisoft DARE 3D Audio Engine"
+      },
+      {
+        "path": "\\Extern\\Dare\\engine\\common\\src\\ToolArch\\Managers\\sndmanager.cpp",
+        "file_offset": 3918528,
+        "virtual_address": 8112832,
+        "xrefs": [
+          {
+            "file_offset": "0x306afc",
+            "code_va": "0x706afc"
+          }
+        ],
+        "subsystem": "Ubisoft DARE 3D Audio Engine"
+      }
+    ],
+    "PoP Interactive Menu UI Framework": [
+      {
+        "path": ".\\Common\\MNU_Util.cpp",
+        "file_offset": 3925136,
+        "virtual_address": 8119440,
+        "xrefs": [
+          {
+            "file_offset": "0x31887f",
+            "code_va": "0x71887f"
+          },
+          {
+            "file_offset": "0x3188b5",
+            "code_va": "0x7188b5"
+          },
+          {
+            "file_offset": "0x3188ff",
+            "code_va": "0x7188ff"
+          },
+          {
+            "file_offset": "0x318935",
+            "code_va": "0x718935"
+          },
+          {
+            "file_offset": "0x31898d",
+            "code_va": "0x71898d"
+          },
+          {
+            "file_offset": "0x3189ad",
+            "code_va": "0x7189ad"
+          },
+          {
+            "file_offset": "0x3189e7",
+            "code_va": "0x7189e7"
+          },
+          {
+            "file_offset": "0x318a39",
+            "code_va": "0x718a39"
+          },
+          {
+            "file_offset": "0x318a80",
+            "code_va": "0x718a80"
+          },
+          {
+            "file_offset": "0x318b33",
+            "code_va": "0x718b33"
+          },
+          {
+            "file_offset": "0x318d51",
+            "code_va": "0x718d51"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_PageStack.cpp",
+        "file_offset": 3925284,
+        "virtual_address": 8119588,
+        "xrefs": [
+          {
+            "file_offset": "0x3194e2",
+            "code_va": "0x7194e2"
+          },
+          {
+            "file_offset": "0x319565",
+            "code_va": "0x719565"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_Focusable.cpp",
+        "file_offset": 3925352,
+        "virtual_address": 8119656,
+        "xrefs": [
+          {
+            "file_offset": "0x319f22",
+            "code_va": "0x719f22"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_EditBox.cpp",
+        "file_offset": 3925460,
+        "virtual_address": 8119764,
+        "xrefs": [
+          {
+            "file_offset": "0x319fb5",
+            "code_va": "0x719fb5"
+          },
+          {
+            "file_offset": "0x31a09f",
+            "code_va": "0x71a09f"
+          },
+          {
+            "file_offset": "0x31a0df",
+            "code_va": "0x71a0df"
+          },
+          {
+            "file_offset": "0x31a11f",
+            "code_va": "0x71a11f"
+          },
+          {
+            "file_offset": "0x31a15f",
+            "code_va": "0x71a15f"
+          },
+          {
+            "file_offset": "0x31a19f",
+            "code_va": "0x71a19f"
+          },
+          {
+            "file_offset": "0x31a4a3",
+            "code_va": "0x71a4a3"
+          },
+          {
+            "file_offset": "0x31aa50",
+            "code_va": "0x71aa50"
+          },
+          {
+            "file_offset": "0x31aa92",
+            "code_va": "0x71aa92"
+          },
+          {
+            "file_offset": "0x31ac67",
+            "code_va": "0x71ac67"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_List.cpp",
+        "file_offset": 3925612,
+        "virtual_address": 8119916,
+        "xrefs": [
+          {
+            "file_offset": "0x31afc1",
+            "code_va": "0x71afc1"
+          },
+          {
+            "file_offset": "0x31b029",
+            "code_va": "0x71b029"
+          },
+          {
+            "file_offset": "0x31b133",
+            "code_va": "0x71b133"
+          },
+          {
+            "file_offset": "0x31b252",
+            "code_va": "0x71b252"
+          },
+          {
+            "file_offset": "0x31b2a2",
+            "code_va": "0x71b2a2"
+          },
+          {
+            "file_offset": "0x31b753",
+            "code_va": "0x71b753"
+          },
+          {
+            "file_offset": "0x31b982",
+            "code_va": "0x71b982"
+          },
+          {
+            "file_offset": "0x31b9fb",
+            "code_va": "0x71b9fb"
+          },
+          {
+            "file_offset": "0x31bad3",
+            "code_va": "0x71bad3"
+          },
+          {
+            "file_offset": "0x31bd2f",
+            "code_va": "0x71bd2f"
+          },
+          {
+            "file_offset": "0x31be13",
+            "code_va": "0x71be13"
+          },
+          {
+            "file_offset": "0x31be73",
+            "code_va": "0x71be73"
+          },
+          {
+            "file_offset": "0x31bf76",
+            "code_va": "0x71bf76"
+          },
+          {
+            "file_offset": "0x31cf0d",
+            "code_va": "0x71cf0d"
+          },
+          {
+            "file_offset": "0x31d0e2",
+            "code_va": "0x71d0e2"
+          },
+          {
+            "file_offset": "0x31d121",
+            "code_va": "0x71d121"
+          },
+          {
+            "file_offset": "0x31d1f7",
+            "code_va": "0x71d1f7"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_Page.cpp",
+        "file_offset": 3926020,
+        "virtual_address": 8120324,
+        "xrefs": [
+          {
+            "file_offset": "0x31d622",
+            "code_va": "0x71d622"
+          },
+          {
+            "file_offset": "0x31d91a",
+            "code_va": "0x71d91a"
+          },
+          {
+            "file_offset": "0x31d980",
+            "code_va": "0x71d980"
+          },
+          {
+            "file_offset": "0x31e082",
+            "code_va": "0x71e082"
+          },
+          {
+            "file_offset": "0x31e0f2",
+            "code_va": "0x71e0f2"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_Slider.cpp",
+        "file_offset": 3926084,
+        "virtual_address": 8120388,
+        "xrefs": [
+          {
+            "file_offset": "0x31e274",
+            "code_va": "0x71e274"
+          },
+          {
+            "file_offset": "0x31e2af",
+            "code_va": "0x71e2af"
+          },
+          {
+            "file_offset": "0x31e40f",
+            "code_va": "0x71e40f"
+          },
+          {
+            "file_offset": "0x31e452",
+            "code_va": "0x71e452"
+          },
+          {
+            "file_offset": "0x31e492",
+            "code_va": "0x71e492"
+          },
+          {
+            "file_offset": "0x31e8b3",
+            "code_va": "0x71e8b3"
+          },
+          {
+            "file_offset": "0x31e914",
+            "code_va": "0x71e914"
+          },
+          {
+            "file_offset": "0x31e9e3",
+            "code_va": "0x71e9e3"
+          },
+          {
+            "file_offset": "0x31eb92",
+            "code_va": "0x71eb92"
+          },
+          {
+            "file_offset": "0x31ee92",
+            "code_va": "0x71ee92"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_Material.cpp",
+        "file_offset": 3926244,
+        "virtual_address": 8120548,
+        "xrefs": [
+          {
+            "file_offset": "0x31f514",
+            "code_va": "0x71f514"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_DisplayStack.cpp",
+        "file_offset": 3926288,
+        "virtual_address": 8120592,
+        "xrefs": [
+          {
+            "file_offset": "0x31f55c",
+            "code_va": "0x71f55c"
+          },
+          {
+            "file_offset": "0x31f5cd",
+            "code_va": "0x71f5cd"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_Interpolator.cpp",
+        "file_offset": 3926372,
+        "virtual_address": 8120676,
+        "xrefs": [
+          {
+            "file_offset": "0x31f9f4",
+            "code_va": "0x71f9f4"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_Factory.cpp",
+        "file_offset": 3926464,
+        "virtual_address": 8120768,
+        "xrefs": [
+          {
+            "file_offset": "0x31fb1c",
+            "code_va": "0x71fb1c"
+          },
+          {
+            "file_offset": "0x31fb4d",
+            "code_va": "0x71fb4d"
+          },
+          {
+            "file_offset": "0x31fc7d",
+            "code_va": "0x71fc7d"
+          },
+          {
+            "file_offset": "0x31fe6c",
+            "code_va": "0x71fe6c"
+          },
+          {
+            "file_offset": "0x31fe8a",
+            "code_va": "0x71fe8a"
+          },
+          {
+            "file_offset": "0x31fea6",
+            "code_va": "0x71fea6"
+          },
+          {
+            "file_offset": "0x320060",
+            "code_va": "0x720060"
+          },
+          {
+            "file_offset": "0x32040e",
+            "code_va": "0x72040e"
+          },
+          {
+            "file_offset": "0x3210aa",
+            "code_va": "0x7210aa"
+          },
+          {
+            "file_offset": "0x321242",
+            "code_va": "0x721242"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_Widget.cpp",
+        "file_offset": 3926984,
+        "virtual_address": 8121288,
+        "xrefs": [
+          {
+            "file_offset": "0x321bac",
+            "code_va": "0x721bac"
+          },
+          {
+            "file_offset": "0x321bdc",
+            "code_va": "0x721bdc"
+          },
+          {
+            "file_offset": "0x321c0c",
+            "code_va": "0x721c0c"
+          },
+          {
+            "file_offset": "0x321c3c",
+            "code_va": "0x721c3c"
+          },
+          {
+            "file_offset": "0x321c6c",
+            "code_va": "0x721c6c"
+          },
+          {
+            "file_offset": "0x321c9c",
+            "code_va": "0x721c9c"
+          },
+          {
+            "file_offset": "0x321ccc",
+            "code_va": "0x721ccc"
+          },
+          {
+            "file_offset": "0x321cfc",
+            "code_va": "0x721cfc"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": "j:\\extern\\magma\\engine\\common\\MNU_Singleton.h",
+        "file_offset": 3927076,
+        "virtual_address": 8121380,
+        "xrefs": [
+          {
+            "file_offset": "0x321f15",
+            "code_va": "0x721f15"
+          },
+          {
+            "file_offset": "0x321f69",
+            "code_va": "0x721f69"
+          },
+          {
+            "file_offset": "0x321fbd",
+            "code_va": "0x721fbd"
+          },
+          {
+            "file_offset": "0x321ff1",
+            "code_va": "0x721ff1"
+          },
+          {
+            "file_offset": "0x322025",
+            "code_va": "0x722025"
+          },
+          {
+            "file_offset": "0x322059",
+            "code_va": "0x722059"
+          },
+          {
+            "file_offset": "0x3220fd",
+            "code_va": "0x7220fd"
+          },
+          {
+            "file_offset": "0x322158",
+            "code_va": "0x722158"
+          },
+          {
+            "file_offset": "0x3221b8",
+            "code_va": "0x7221b8"
+          },
+          {
+            "file_offset": "0x322212",
+            "code_va": "0x722212"
+          },
+          {
+            "file_offset": "0x328e4c",
+            "code_va": "0x728e4c"
+          },
+          {
+            "file_offset": "0x328e9c",
+            "code_va": "0x728e9c"
+          },
+          {
+            "file_offset": "0x328ef0",
+            "code_va": "0x728ef0"
+          },
+          {
+            "file_offset": "0x32a852",
+            "code_va": "0x72a852"
+          },
+          {
+            "file_offset": "0x32a8a6",
+            "code_va": "0x72a8a6"
+          },
+          {
+            "file_offset": "0x32a8fa",
+            "code_va": "0x72a8fa"
+          },
+          {
+            "file_offset": "0x32a94e",
+            "code_va": "0x72a94e"
+          },
+          {
+            "file_offset": "0x32aa83",
+            "code_va": "0x72aa83"
+          },
+          {
+            "file_offset": "0x32aaf2",
+            "code_va": "0x72aaf2"
+          },
+          {
+            "file_offset": "0x32ab67",
+            "code_va": "0x72ab67"
+          },
+          {
+            "file_offset": "0x32abdd",
+            "code_va": "0x72abdd"
+          },
+          {
+            "file_offset": "0x32ac6c",
+            "code_va": "0x72ac6c"
+          },
+          {
+            "file_offset": "0x32acdb",
+            "code_va": "0x72acdb"
+          },
+          {
+            "file_offset": "0x32ad50",
+            "code_va": "0x72ad50"
+          },
+          {
+            "file_offset": "0x32adc6",
+            "code_va": "0x72adc6"
+          },
+          {
+            "file_offset": "0x32ae5d",
+            "code_va": "0x72ae5d"
+          },
+          {
+            "file_offset": "0x32ae93",
+            "code_va": "0x72ae93"
+          },
+          {
+            "file_offset": "0x32aee6",
+            "code_va": "0x72aee6"
+          },
+          {
+            "file_offset": "0x32af47",
+            "code_va": "0x72af47"
+          },
+          {
+            "file_offset": "0x32af8b",
+            "code_va": "0x72af8b"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_Package.cpp",
+        "file_offset": 3927172,
+        "virtual_address": 8121476,
+        "xrefs": [
+          {
+            "file_offset": "0x322c5e",
+            "code_va": "0x722c5e"
+          },
+          {
+            "file_offset": "0x32305a",
+            "code_va": "0x72305a"
+          },
+          {
+            "file_offset": "0x323081",
+            "code_va": "0x723081"
+          },
+          {
+            "file_offset": "0x38ff27",
+            "code_va": "0x78ff27"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_LoadVisitor.cpp",
+        "file_offset": 3927452,
+        "virtual_address": 8121756,
+        "xrefs": [
+          {
+            "file_offset": "0x32340c",
+            "code_va": "0x72340c"
+          },
+          {
+            "file_offset": "0x325a75",
+            "code_va": "0x725a75"
+          },
+          {
+            "file_offset": "0x325aca",
+            "code_va": "0x725aca"
+          },
+          {
+            "file_offset": "0x326b2b",
+            "code_va": "0x726b2b"
+          },
+          {
+            "file_offset": "0x326b4b",
+            "code_va": "0x726b4b"
+          },
+          {
+            "file_offset": "0x326b74",
+            "code_va": "0x726b74"
+          },
+          {
+            "file_offset": "0x326bac",
+            "code_va": "0x726bac"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_Element.cpp",
+        "file_offset": 3929112,
+        "virtual_address": 8123416,
+        "xrefs": [
+          {
+            "file_offset": "0x32878d",
+            "code_va": "0x72878d"
+          },
+          {
+            "file_offset": "0x328d80",
+            "code_va": "0x728d80"
+          },
+          {
+            "file_offset": "0x328dd2",
+            "code_va": "0x728dd2"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_Text.cpp",
+        "file_offset": 3929200,
+        "virtual_address": 8123504,
+        "xrefs": [
+          {
+            "file_offset": "0x328faf",
+            "code_va": "0x728faf"
+          },
+          {
+            "file_offset": "0x32a0f9",
+            "code_va": "0x72a0f9"
+          },
+          {
+            "file_offset": "0x32a15c",
+            "code_va": "0x72a15c"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_Button.cpp",
+        "file_offset": 3929464,
+        "virtual_address": 8123768,
+        "xrefs": [
+          {
+            "file_offset": "0x32a202",
+            "code_va": "0x72a202"
+          },
+          {
+            "file_offset": "0x32a677",
+            "code_va": "0x72a677"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_CheckBox.cpp",
+        "file_offset": 3929720,
+        "virtual_address": 8124024,
+        "xrefs": [
+          {
+            "file_offset": "0x32b333",
+            "code_va": "0x72b333"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_ButtonInstance.cpp",
+        "file_offset": 3929768,
+        "virtual_address": 8124072,
+        "xrefs": [
+          {
+            "file_offset": "0x32b403",
+            "code_va": "0x72b403"
+          },
+          {
+            "file_offset": "0x32b483",
+            "code_va": "0x72b483"
+          },
+          {
+            "file_offset": "0x32b592",
+            "code_va": "0x72b592"
+          },
+          {
+            "file_offset": "0x32b5e2",
+            "code_va": "0x72b5e2"
+          },
+          {
+            "file_offset": "0x32b642",
+            "code_va": "0x72b642"
+          },
+          {
+            "file_offset": "0x32b692",
+            "code_va": "0x72b692"
+          },
+          {
+            "file_offset": "0x32b6f3",
+            "code_va": "0x72b6f3"
+          },
+          {
+            "file_offset": "0x32b76d",
+            "code_va": "0x72b76d"
+          },
+          {
+            "file_offset": "0x32b955",
+            "code_va": "0x72b955"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_LinkSolverVisitor.cpp",
+        "file_offset": 3930044,
+        "virtual_address": 8124348,
+        "xrefs": [
+          {
+            "file_offset": "0x32c38a",
+            "code_va": "0x72c38a"
+          },
+          {
+            "file_offset": "0x32c440",
+            "code_va": "0x72c440"
+          },
+          {
+            "file_offset": "0x32c4a0",
+            "code_va": "0x72c4a0"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      },
+      {
+        "path": ".\\Common\\MNU_WidgetVisitor.cpp",
+        "file_offset": 3930264,
+        "virtual_address": 8124568,
+        "xrefs": [
+          {
+            "file_offset": "0x32c790",
+            "code_va": "0x72c790"
+          },
+          {
+            "file_offset": "0x32c7e0",
+            "code_va": "0x72c7e0"
+          }
+        ],
+        "subsystem": "PoP Interactive Menu UI Framework"
+      }
+    ],
+    "PoP Typography & Font Subsystem": [
+      {
+        "path": ".\\Common\\FNT_FontServer.cpp",
+        "file_offset": 3926772,
+        "virtual_address": 8121076,
+        "xrefs": [
+          {
+            "file_offset": "0x32129c",
+            "code_va": "0x72129c"
+          },
+          {
+            "file_offset": "0x321341",
+            "code_va": "0x721341"
+          },
+          {
+            "file_offset": "0x321368",
+            "code_va": "0x721368"
+          },
+          {
+            "file_offset": "0x3213d7",
+            "code_va": "0x7213d7"
+          },
+          {
+            "file_offset": "0x32146b",
+            "code_va": "0x72146b"
+          },
+          {
+            "file_offset": "0x321500",
+            "code_va": "0x721500"
+          },
+          {
+            "file_offset": "0x321592",
+            "code_va": "0x721592"
+          },
+          {
+            "file_offset": "0x3215be",
+            "code_va": "0x7215be"
+          },
+          {
+            "file_offset": "0x32166d",
+            "code_va": "0x72166d"
+          },
+          {
+            "file_offset": "0x321995",
+            "code_va": "0x721995"
+          },
+          {
+            "file_offset": "0x321a22",
+            "code_va": "0x721a22"
+          },
+          {
+            "file_offset": "0x321aaf",
+            "code_va": "0x721aaf"
+          },
+          {
+            "file_offset": "0x321ad6",
+            "code_va": "0x721ad6"
+          }
+        ],
+        "subsystem": "PoP Typography & Font Subsystem"
+      },
+      {
+        "path": ".\\Common\\FNT_Font.cpp",
+        "file_offset": 3929028,
+        "virtual_address": 8123332,
+        "xrefs": [
+          {
+            "file_offset": "0x32830f",
+            "code_va": "0x72830f"
+          },
+          {
+            "file_offset": "0x328336",
+            "code_va": "0x728336"
+          }
+        ],
+        "subsystem": "PoP Typography & Font Subsystem"
+      }
+    ]
+  }
+}

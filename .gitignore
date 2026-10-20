@@ -1,4 +1,46 @@
-*.bf
-.DS_Store
+# Python bytecode & cache
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.pyd
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDE & Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Proprietary Game Executables & Large Archives
+POP.EXE
+pop.exe
+*.bf
+*.BF
+*.bin
+*.BIN
+
+# Large Extracted Game Assets, Source Dumps & Scratch Dirs
+jaded-src/
+Uncooked Prince3BF/
+Uncook/
+scratch/
+
+# Compiled native shared libraries (recompiled automatically on launch)
+*.dylib
+*.so
+*.dll
+*.o
+*.obj
+build/
+dist/
+*.egg-info/

@@ -1,0 +1,88 @@
+[
+  {
+    "module": "BIGopen (File Opening & Header Checks)",
+    "pop_path": "Libraries/Sdk/Sources/BIGfiles/BIGopen.c",
+    "jade_path": "src/libraries/SDK/Sources/BIGfiles/BIGopen.c",
+    "pop_exists": true,
+    "jade_exists": true,
+    "observations": [],
+    "pop_file_size": 6993,
+    "jade_file_size": 7138
+  },
+  {
+    "module": "BIGfat (FAT Table Parsing, Directory & File Ext Layout)",
+    "pop_path": "Libraries/Sdk/Sources/BIGfiles/BIGfat.c",
+    "jade_path": "src/libraries/SDK/Sources/BIGfiles/BIGfat.c",
+    "pop_exists": true,
+    "jade_exists": true,
+    "observations": [
+      "FAT Header struct size is 44 bytes in both. In POP.EXE, FileTableExt is 84 bytes (without ul_P4RevisionClient). In jaded-src, BIG_Version() >= 36 assumes 88 bytes, which corrupts FAT parsing on prince3.bf. Fix requires recognizing v37 as 84 bytes."
+    ],
+    "pop_file_size": 14824,
+    "jade_file_size": 51425
+  },
+  {
+    "module": "BIGread (File Buffer Allocation & Read Pipeline)",
+    "pop_path": "Libraries/Sdk/Sources/BIGfiles/BIGread.c",
+    "jade_path": "src/libraries/SDK/Sources/BIGfiles/BIGread.c",
+    "pop_exists": true,
+    "jade_exists": true,
+    "observations": [
+      "POP.EXE uses mask 0x7FFFFFFF on file lengths to support compressed/binarized flag and seamlessly decompresses files. In jaded-src, BIG_special_LZOload was conditionally compiled under #ifdef ACTIVE_EDITORS; in POP retail, transparent decoding is always active."
+    ],
+    "pop_file_size": 14696,
+    "jade_file_size": 18776
+  },
+  {
+    "module": "BIGcomp (LZO Decompression & Block Streaming)",
+    "pop_path": "Libraries/Sdk/Sources/BIGfiles/BIGcomp.c",
+    "jade_path": "src/libraries/SDK/Sources/BIGfiles/BIGcomp.c",
+    "pop_exists": true,
+    "jade_exists": true,
+    "observations": [
+      "POP.EXE adds BIGcomp_DecodeAllAvailableBlocks (VA 0x42AEA0) which is missing from jaded-src. Both share BIGcomp_DecodeBlocks with identical 128KB chunk framing and LZO1X."
+    ],
+    "pop_file_size": 8857,
+    "jade_file_size": 13803
+  },
+  {
+    "module": "BIGio (Streaming SpeedMode fread & Buffer Constraints)",
+    "pop_path": "Libraries/Sdk/Sources/BIGfiles/BIGio.c",
+    "jade_path": "src/libraries/SDK/Sources/BIGfiles/BIGio.c",
+    "pop_exists": true,
+    "jade_exists": true,
+    "observations": [],
+    "pop_file_size": 5457,
+    "jade_file_size": 46270
+  },
+  {
+    "module": "LOAdefs (Key-to-Pos Lookup & Dynamic Loader)",
+    "pop_path": "Libraries/Sdk/Sources/BIGfiles/LOAding/LOAdefs.c",
+    "jade_path": "src/libraries/SDK/Sources/BIGfiles/LOAding/LOAdefs.c",
+    "pop_exists": true,
+    "jade_exists": true,
+    "observations": [],
+    "pop_file_size": 4820,
+    "jade_file_size": 64093
+  },
+  {
+    "module": "OBJload (Game Object Loading & GAO Format Version)",
+    "pop_path": "Libraries/ENGine/Sources/OBJects/OBJload.c",
+    "jade_path": "src/libraries/ENGine/Sources/OBJects/OBJload.c",
+    "pop_exists": true,
+    "jade_exists": true,
+    "observations": [
+      "POP.EXE assertion line 850 enforces 'ulGaoVersion <= 10'. Jaded-src also checks GAO versioning but needs confirmation of GAO struct compatibility for PoP characters/meshes."
+    ],
+    "pop_file_size": 4829,
+    "jade_file_size": 70951
+  },
+  {
+    "module": "WORDynLoad (Dynamic World Streaming & Wow Bins)",
+    "pop_path": "Libraries/ENGine/Sources/WORld/WORDynLoad.c",
+    "jade_path": "src/libraries/ENGine/Sources/WORld/WORDynLoad.c",
+    "pop_exists": true,
+    "jade_exists": false,
+    "observations": []
+  }
+]

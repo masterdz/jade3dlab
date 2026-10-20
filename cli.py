@@ -1,19 +1,62 @@
 import sys
 import os
 import struct
-from jade_engine.bf_parser import load_bf
+from pathlib import Path
+from jade_engine.bf_parser import load_bf, read_bigfile
 from jade_engine.bin_parser import decompress_bin
 from jade_engine.mesh_extractor import extract_all_meshes, find_gao_names
+from jade_engine.textures import extract_all_textures, scan_pop_textures
 
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python3 cli.py <bf_file> [file_name]")
-        print("  python3 cli.py PRINCE.BF              # List all files")
-        print("  python3 cli.py PRINCE.BF file.bin     # Extract and analyze file")
+        print("Usage:")
+        print("  python3 cli.py <bf_file>                           # List all files")
+        print("  python3 cli.py <bf_file> <file_name>               # Extract and analyze file")
+        print("  python3 cli.py <bf_file> --extract-textures <file> # Extract textures in original format (.dds/.tga)")
+        print("  python3 cli.py <bf_file> --extract-all-textures    # Extract all textures from whole archive")
         sys.exit(1)
 
     bf_path = sys.argv[1]
+
+    # Handle --extract-all-textures
+    if len(sys.argv) >= 3 and sys.argv[2] == "--extract-all-textures":
+        out_dir = Path(sys.argv[3]) if len(sys.argv) > 3 else Path(bf_path).stem + "_textures_original"
+        print(f"Loading {bf_path}...")
+        bf = read_bigfile(bf_path)
+        total_extracted = 0
+        for entry in bf.entries:
+            try:
+                data = bf.read_entry(entry)
+                texs = scan_pop_textures(data)
+                if texs:
+                    stem = entry.name.replace(".bin", "").replace(".wow", "").replace(".wol", "")
+                    entry_out = out_dir / stem
+                    results = extract_all_textures(data, entry_out, prefix=f"{stem}_")
+                    print(f"  {entry.name:40s} -> Extracted {len(results)} textures")
+                    total_extracted += len(results)
+            except Exception:
+                continue
+        print(f"\nDone! Extracted {total_extracted} textures in original format to: {out_dir}")
+        return
+
+    # Handle --extract-textures <file_name>
+    if len(sys.argv) >= 4 and sys.argv[2] == "--extract-textures":
+        target_name = sys.argv[3]
+        out_dir = Path(sys.argv[4]) if len(sys.argv) > 4 else Path(f"{target_name}_textures_original")
+        print(f"Loading {bf_path}...")
+        bf = read_bigfile(bf_path)
+        entry = bf.get_entry_by_name(target_name)
+        if not entry:
+            print(f"File not found: {target_name}")
+            return
+        data = bf.read_entry(entry)
+        results = extract_all_textures(data, out_dir, prefix=f"{Path(target_name).stem}_")
+        print(f"Extracted {len(results)} textures in original format (.dds/.tga) to: {out_dir}")
+        for tex, path, _ in results:
+            print(f"  Key 0x{tex.key:08X} ({tex.format}): {path.name} ({path.stat().st_size:,} bytes)")
+        return
+
     target_name = sys.argv[2] if len(sys.argv) > 2 else None
 
     print(f"Loading {bf_path}...")

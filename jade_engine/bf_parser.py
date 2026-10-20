@@ -1,299 +1,235 @@
+"""Jade BigFile (.bf) archive reader, FAT indexing, and entry decompression."""
+from __future__ import annotations
+
+from pathlib import Path
 import struct
-import re
-from dataclasses import dataclass, field
-from typing import List, Dict, Optional
-from io import BytesIO
+from typing import Dict, List, Optional, Set, Tuple
+
+from .lzo import decompress_pop_lzo, looks_like_pop_lzo
+from .models import BigFileEntry, BigFileInfo
+from .level_scene import level_asset_kind
+
+LEGACY_BF_HEADER_SIZE = 44
+LEGACY_BF_FILE_TABLE_ENTRY_SIZE = 8
+LEGACY_BF_FILE_ENTRY_SIZE = 84
 
 
-@dataclass
-class BFFile:
-    offset: int
-    key: int
-    size: int
-    data: bytes
-    filename: str = ""
-
-
-@dataclass
 class BFArchive:
-    version: int
-    elem_count: int
-    files: List[BFFile] = field(default_factory=list)
-    filenames: Dict[int, str] = field(default_factory=dict)
+    """Convenient high-level interface over a loaded BigFile archive."""
 
-    def get_file_by_key(self, key: int) -> Optional[BFFile]:
-        for f in self.files:
-            if f.key == key:
-                return f
-        return None
+    def __init__(self, info: BigFileInfo):
+        self.info = info
+        self.path = info.path
+        self.version = info.version
+        self.entries = info.entries
+        self._entries_by_key: Dict[int, BigFileEntry] = {e.key: e for e in self.entries}
+        self._entries_by_name: Dict[str, BigFileEntry] = {e.name.casefold(): e for e in self.entries}
 
-    def get_file_by_name(self, name: str) -> Optional[BFFile]:
-        norm = name.lstrip('?').strip().lower()
-        for f in self.files:
-            if f.filename and f.filename.lstrip('?').strip().lower() == norm:
-                return f
-            if f.filename and f.filename.lower() == name.lower():
-                return f
-        return None
+        # Backwards compatibility: attach archive reference to each entry
+        for e in self.entries:
+            e._archive = self
 
-    def get_files_by_extension(self, ext: str) -> List[BFFile]:
-        if not ext.startswith('.'):
-            ext = '.' + ext
-        return [f for f in self.files if f.filename.lower().endswith(ext.lower())]
+    @property
+    def files(self) -> List[BigFileEntry]:
+        """Backward compatibility alias for entries."""
+        return self.entries
 
+    @property
+    def elem_count(self) -> int:
+        return len(self.entries)
 
-def _extract_filenames_from_data(data: bytes) -> Dict[str, str]:
-    hash_to_filename = {}
-    patterns = [
-        rb'[\x20-\x7e]{3,60}_(?:wow|wol)_([0-9a-f]{8})\.bin\x00',
-        rb'[\x20-\x7e]{3,60}_([0-9a-f]{8})\.bin\x00',
-        rb'[\x20-\x7e]{3,60}\.bin\x00',
-    ]
-    for pattern in patterns:
-        for m in re.finditer(pattern, data):
-            filename = m.group(0).rstrip(b'\x00').decode('ascii', errors='replace')
-            if filename.startswith('?'):
-                filename = filename[1:]
-            hash_match = re.search(r'_([0-9a-f]{8})\.bin$', filename)
-            if hash_match:
-                hash_str = hash_match.group(1).upper()
-                hash_to_filename[hash_str] = filename
-    return hash_to_filename
+    def get_entry_by_key(self, key: int) -> Optional[BigFileEntry]:
+        return self._entries_by_key.get(key)
 
+    def get_entry_by_name(self, name: str) -> Optional[BigFileEntry]:
+        return self._entries_by_name.get(name.casefold())
 
-def parse_bf(data: bytes) -> BFArchive:
-    buf = BytesIO(data)
+    def get_file_by_name(self, name: str) -> Optional[BigFileEntry]:
+        """Backward compatibility alias."""
+        return self.get_entry_by_name(name)
 
-    magic = buf.read(4)
-    if magic != b'BIG\x00':
-        raise ValueError(f"Invalid BF magic: {magic!r}")
+    def get_file_by_key(self, key: int) -> Optional[BigFileEntry]:
+        """Backward compatibility alias."""
+        return self.get_entry_by_key(key)
 
-    version = struct.unpack('<I', buf.read(4))[0]
-    elem_count = struct.unpack('<I', buf.read(4))[0]
-    buf.read(4)
-    buf.read(8)
-    buf.read(8)
-    buf.read(4)
-    buf.read(4)
-    buf.read(4)
+    def read_file(self, entry: BigFileEntry, decompress: bool = True) -> bytes:
+        """Backward compatibility alias for read_entry."""
+        return self.read_entry(entry, decompress=decompress)
 
-    archive = BFArchive(version=version, elem_count=elem_count)
-
-    buf.read(4)
-    buf.read(4)
-    buf.read(4)
-    buf.read(4)
-    buf.read(4)
-    buf.read(4)
-
-    fat_entries = []
-    for _ in range(elem_count):
-        offset = struct.unpack('<I', buf.read(4))[0]
-        key = struct.unpack('<I', buf.read(4))[0]
-        fat_entries.append((offset, key))
-
-    hash_to_filename = _extract_filenames_from_data(data)
-
-    for i, (offset, key) in enumerate(fat_entries):
-        buf.seek(offset)
-        file_size = struct.unpack('<I', buf.read(4))[0]
-        file_data = buf.read(file_size)
-
-        key_str = f'{key:08X}'
-        filename = hash_to_filename.get(key_str, "")
-
-        bf_file = BFFile(
-            offset=offset,
-            key=key,
-            size=file_size,
-            data=file_data,
-            filename=filename,
-        )
-        archive.files.append(bf_file)
-
-    return archive
-
-
-def load_bf(path: str) -> BFArchive:
-    with open(path, 'rb') as f:
-        data = f.read()
-    return parse_bf(data)
-
-
-def _scan_hash_names(f) -> Dict[str, str]:
-    import os as _os
-    f.seek(0, _os.SEEK_END)
-    size = f.tell()
-    step = 1 << 20
-    hash_to_filename = {}
-    overlap = 128
-    buf = b''
-    pos = 0
-    f.seek(0)
-    while pos < size:
-        chunk = f.read(step)
-        if not chunk:
-            break
-        data = buf + chunk
-        for m in re.finditer(rb'[\x20-\x7e]{3,60}_([0-9a-fA-F]{8})\.bin\x00', data):
-            filename = m.group(0).rstrip(b'\x00').decode('ascii', errors='replace')
-            filename = filename.lstrip('?').strip()
-            hm = re.search(r'_([0-9a-fA-F]{8})\.bin$', filename)
-            if hm:
-                hash_to_filename[hm.group(1).upper()] = filename
-        buf = data[-overlap:] if len(data) > overlap else data
-        pos += len(chunk)
-    return hash_to_filename
-
-
-def _find_string_table(f, fat_data: bytes, elem_count: int, version: int):
-    import os as _os
-    keys = [struct.unpack('<I', fat_data[i*8+4:i*8+8])[0] for i in range(elem_count)]
-    f.seek(0, _os.SEEK_END)
-    size = f.tell()
-    step = 1 << 20
-    overlap = 256
-    buf = b''
-    base = 0
-    pos = 0
-    f.seek(0)
-    first = None
-    while pos < size:
-        chunk = f.read(step)
-        if not chunk:
-            break
-        data = buf + chunk
-        for m in re.finditer(rb'[\x20-\x7e]{3,60}_[0-9a-fA-F]{8}\.bin\x00', data):
-            first = base + m.start()
-            break
-        if first is not None:
-            break
-        buf = data[-overlap:] if len(data) > overlap else data
-        base = pos - len(buf) + overlap if buf else pos
-        pos += len(chunk)
-    if first is None:
-        return None
-    for k in range(min(elem_count, 400)):
-        start = first - 20 - k * 84
-        if start < 0:
-            continue
-        f.seek(start)
-        try:
-            raw = f.read(84 * min(elem_count, 12))
-        except Exception:
-            continue
-        if len(raw) < 84:
-            continue
-        score = tested = 0
-        for i in range(min(elem_count, 12)):
-            off = i * 84
-            nm = raw[off+20:off+84].split(b'\x00')[0]
+    def read_entry(self, entry: BigFileEntry, decompress: bool = True) -> bytes:
+        """Read raw or decompressed bytes for a specific archive entry."""
+        with open(self.path, "rb") as stream:
+            stream.seek(entry.position + entry.data_header_size)
+            data = stream.read(entry.size & 0x7FFFFFFF)
+        if decompress and (entry.compressed or looks_like_pop_lzo(data)):
             try:
-                s = nm.decode('ascii')
+                return decompress_pop_lzo(data)
             except Exception:
-                break
-            import re as _re
-            hm = _re.search(r'_([0-9a-fA-F]{8})\.bin$', s)
-            if not hm:
-                break
-            tested += 1
-            if hm.group(1).upper() == f'{keys[i]:08X}':
-                score += 1
-        if tested >= 8 and score == tested:
-            return start
-    return None
+                return data
+        return data
+
+    def get_wol_entries(self) -> List[BigFileEntry]:
+        """All World Object List (WOL) level roots."""
+        return [e for e in self.entries if level_asset_kind(e.name) == "wol"]
+
+    def get_wow_entries(self) -> List[BigFileEntry]:
+        """All World Object Wave (WOW) room / character / asset files."""
+        return [e for e in self.entries if level_asset_kind(e.name) == "wow"]
+
+    def get_bin_entries(self) -> List[BigFileEntry]:
+        """All .bin files in the archive."""
+        return [e for e in self.entries if e.name.casefold().endswith(".bin")]
 
 
-def load_bf_fast(path: str) -> BFArchive:
-    with open(path, 'rb') as f:
-        header = f.read(68)
-        magic = header[0:4]
-        if magic != b'BIG\x00':
-            raise ValueError(f"Invalid BF magic: {magic!r}")
+# Attach filename and data properties to BigFileEntry for backward compatibility
+if not hasattr(BigFileEntry, "filename"):
+    BigFileEntry.filename = property(lambda self: self.name)
 
-        version = struct.unpack('<I', header[4:8])[0]
-        elem_count = struct.unpack('<I', header[8:12])[0]
+if not hasattr(BigFileEntry, "data"):
+    def _entry_data(self):
+        archive = getattr(self, "_archive", None)
+        if archive:
+            return archive.read_entry(self, decompress=False)
+        return b""
+    BigFileEntry.data = property(_entry_data)
 
-        archive = BFArchive(version=version, elem_count=elem_count)
 
-        fat_start = 68
-        f.seek(fat_start)
-        fat_data = f.read(elem_count * 8)
+def _read_popdata_archive(path: Path, data: bytes) -> BFArchive:
+    """Parse POPData.BF package archive (menus, localized strings, UI textures, fonts)."""
+    fat_size = struct.unpack_from("<I", data, 0)[0]
+    pos = 4
+    entries: List[BigFileEntry] = []
+    idx = 0
+    while pos < fat_size:
+        id1, offset, size, f4, nlen = struct.unpack_from("<5I", data, pos)
+        raw_name = data[pos + 20:pos + 20 + nlen].rstrip(b"\0")
+        name = raw_name.decode("ascii", errors="replace").strip() or f"file_{idx:03d}"
+        pos += 20 + nlen
+        key = id1 if id1 != 0 else (0x80000000 | idx)
+        data_pos = fat_size + offset
+        data_header_size = 4 if name.endswith(".dds") and data[data_pos + 4:data_pos + 8] == b"DDS " else 0
+        actual_size = size - data_header_size if data_header_size else size
+        entries.append(BigFileEntry(
+            idx, data_pos, key, actual_size, name, 0,
+            0, idx, False, data_header_size, "none"
+        ))
+        idx += 1
+    info = BigFileInfo(path, 1, len(entries), 1, len(entries), 1, 0, False, entries)
+    return BFArchive(info)
 
-        known_offsets = {
-            (37, 3308): 0x1796EC,
-            (38, 5346): 0x1C90AC,
-            (38, 6648): 0x1C34EC,
-            (38, 3897): 0x1B5E84,
-            (38, 5272): 0x1C07F4,
-            (38, 538): 0x10F34C,
-            (42, 2517): 0x009C84,
-            (38, 6432): 0x1A2DF4,
-            (37, 159): 0x152B9C,
-            (37, 102): None,
-        }
 
-        string_table = []
-        table_off = known_offsets.get((version, elem_count), 'auto')
-        if table_off is None:
-            table_off = _find_string_table(f, fat_data, elem_count, version)
+def read_bigfile(path: str | Path) -> BFArchive:
+    """Parse Jade .bf BigFile archive header, FAT tables, and filenames."""
+    path = Path(path)
+    file_size = path.stat().st_size
+    with open(path, "rb") as stream:
+        header = stream.read(44)
+        if len(header) != 44:
+            raise ValueError(f"File {path.name} is too small to be a Jade BF archive.")
+        magic, version, max_file, max_dir, _max_key, _root, _free_file, _free_dir, size_fat, num_fat, universe_key = struct.unpack(
+            "<4s10I", header
+        )
+        if magic not in (b"BIG\0", b"BUG\0"):
+            # Check for POPData.BF package format
+            stream.seek(0)
+            file_data = stream.read()
+            if len(file_data) >= 28:
+                possible_fat_size = struct.unpack_from("<I", file_data, 0)[0]
+                if 16 < possible_fat_size < len(file_data) and 0 < struct.unpack_from("<I", file_data, 20)[0] < 256:
+                    return _read_popdata_archive(path, file_data)
+            raise ValueError(f"Unrecognized BIG header magic: {magic!r}")
 
-        if table_off is not None:
-            f.seek(table_off)
-            for i in range(elem_count):
-                aligned_len = struct.unpack('<i', f.read(4))[0]
-                next_idx = struct.unpack('<i', f.read(4))[0]
-                prev_idx = struct.unpack('<i', f.read(4))[0]
-                d = struct.unpack('<I', f.read(4))[0]
-                e = struct.unpack('<I', f.read(4))[0]
-                raw_name = f.read(64)
-                filename = raw_name.split(b'\x00')[0].decode('ascii', errors='replace')
-                filename = filename.lstrip('?').strip()
-                filename = ''.join(c for c in filename if c.isprintable() or c in ('_', '-', '.', ' '))
+        entries: List[BigFileEntry] = []
+        descriptor_pos = 44
+        for fat_index in range(num_fat):
+            stream.seek(descriptor_pos)
+            raw = stream.read(24)
+            if len(raw) != 24:
+                raise ValueError(f"Truncated FAT descriptor #{fat_index}.")
+            fat_max_file, _fat_max_dir, pos_fat, next_pos_fat, first_index, _last_index = struct.unpack("<6I", raw)
 
-                if version >= 42:
-                    f.read(4)
-                    f.read(32)
-                    f.read(4)
+            stream.seek(pos_fat)
+            file_table = stream.read(fat_max_file * 8)
+            ext_base = pos_fat + size_fat * 8
+            stream.seek(ext_base)
+            ext_table = stream.read(fat_max_file * LEGACY_BF_FILE_ENTRY_SIZE)
 
-                string_table.append({
-                    'aligned_len': aligned_len,
-                    'next': next_idx,
-                    'prev': prev_idx,
-                    'd': d,
-                    'e': e,
-                    'filename': filename,
-                    'index': i,
-                })
+            if len(file_table) != fat_max_file * 8 or len(ext_table) != fat_max_file * LEGACY_BF_FILE_ENTRY_SIZE:
+                raise ValueError(f"Truncated FAT table #{fat_index}.")
 
-            for i, entry in enumerate(string_table):
-                archive.filenames[i] = entry['filename']
+            for i in range(fat_max_file):
+                position, key = struct.unpack_from("<2I", file_table, i * 8)
+                if key == 0xFFFFFFFF:
+                    continue
+                ext = ext_table[i * LEGACY_BF_FILE_ENTRY_SIZE:(i + 1) * LEGACY_BF_FILE_ENTRY_SIZE]
+                physical_size = struct.unpack_from("<I", ext, 0)[0] & 0x7FFFFFFF
+                parent = struct.unpack_from("<I", ext, 12)[0]
+                raw_name = ext[20:84].split(b"\0", 1)[0]
+                name = raw_name.decode("ascii", errors="replace").strip() or f"<file_{first_index + i:06d}>"
 
-        hash_names = None
-        if not string_table:
-            hash_names = _scan_hash_names(f)
+                data_header_size = 0
+                compressed = False
+                compression = "none"
 
-        for i in range(elem_count):
-            offset = struct.unpack('<I', fat_data[i*8:i*8+4])[0]
-            key = struct.unpack('<I', fat_data[i*8+4:i*8+8])[0]
+                if version in (37, 38) and position + 4 <= file_size:
+                    stream.seek(position)
+                    header_check = struct.unpack("<I", stream.read(4))[0]
+                    if header_check == physical_size:
+                        data_header_size = 4
+                        stream.seek(position + 4)
+                        prefix = stream.read(min(32, physical_size))
+                        compressed = looks_like_pop_lzo(prefix)
+                        compression = "POP-LZO" if compressed else "none"
 
-            filename = ""
-            if i < len(string_table):
-                filename = string_table[i]['filename']
-            elif hash_names is not None:
-                filename = hash_names.get(f'{key:08X}', '')
+                entries.append(BigFileEntry(
+                    first_index + i, position, key, physical_size, name, parent,
+                    fat_index, first_index, compressed, data_header_size, compression
+                ))
 
-            f.seek(offset)
-            file_size = struct.unpack('<I', f.read(4))[0]
-            file_data = f.read(file_size)
+            descriptor_pos = next_pos_fat - 24 if next_pos_fat != 0xFFFFFFFF else descriptor_pos + 24
 
-            bf_file = BFFile(
-                offset=offset,
-                key=key,
-                size=file_size,
-                data=file_data,
-                filename=filename,
-            )
-            archive.files.append(bf_file)
+        # Resolve directory hierarchy if directory table is present (uncooked BigFiles like Rayman4.bf)
+        if max_dir > 0 and file_size > 1024:
+            try:
+                stream.seek(0)
+                scan_buf = stream.read(min(35 * 1024 * 1024, file_size))
+                root_pos = scan_buf.find(b"\xff\xff\xff\xffROOT")
+                if root_pos >= 16:
+                    dir_start = root_pos - 16
+                    stream.seek(dir_start)
+                    dirs = []
+                    for _ in range(min(max_dir, 30000)):
+                        raw_dir = stream.read(84)
+                        if len(raw_dir) < 84:
+                            break
+                        first_f, child, nxt, prv, parent = struct.unpack_from("<Iiiii", raw_dir, 0)
+                        d_name = raw_dir[20:84].split(b"\0", 1)[0].decode("latin-1", "replace").strip()
+                        dirs.append({"name": d_name or "Dir", "parent": parent})
 
-    return archive
+                    dir_cache = {}
+                    for d_idx in range(len(dirs)):
+                        parts = []
+                        cur = d_idx
+                        seen = set()
+                        while cur != -1 and 0 <= cur < len(dirs) and cur not in seen:
+                            seen.add(cur)
+                            parts.append(dirs[cur]["name"])
+                            cur = dirs[cur]["parent"]
+                        dir_cache[d_idx] = "/".join(reversed(parts))
+
+                    for e in entries:
+                        if e.parent in dir_cache:
+                            e.dir_path = dir_cache[e.parent]
+                            e.full_path = f"{e.dir_path}/{e.name}"
+            except Exception:
+                pass
+
+    entries.sort(key=lambda e: (e.fat_index, e.index))
+    info = BigFileInfo(path, version, max_file, max_dir, size_fat, num_fat, universe_key, magic == b"BUG\0", entries)
+    return BFArchive(info)
+
+
+# Alias
+load_bf = read_bigfile
+load_bf_fast = read_bigfile
+BFFile = BigFileEntry

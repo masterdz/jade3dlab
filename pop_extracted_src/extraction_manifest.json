@@ -1,0 +1,236 @@
+[
+  {
+    "source_path": ".\\Source\\PCGraphics.cpp",
+    "target_path": "Source/PCGraphics.cpp",
+    "assertions": 1,
+    "functions": 1
+  },
+  {
+    "source_path": ".\\Source\\PCTextureMgr.cpp",
+    "target_path": "Source/PCTextureMgr.cpp",
+    "assertions": 1,
+    "functions": 1
+  },
+  {
+    "source_path": ".\\Source\\ShadowMgr.cpp",
+    "target_path": "Source/ShadowMgr.cpp",
+    "assertions": 2,
+    "functions": 2
+  },
+  {
+    "source_path": "\\Libraries\\AIinterp\\Sources\\AIengine.c",
+    "target_path": "Libraries/AIinterp/Sources/AIengine.c",
+    "assertions": 3,
+    "functions": 2
+  },
+  {
+    "source_path": "\\Libraries\\AIinterp\\Sources\\AIfactory.c",
+    "target_path": "Libraries/AIinterp/Sources/AIfactory.c",
+    "assertions": 23,
+    "functions": 7
+  },
+  {
+    "source_path": "\\Libraries\\AIinterp\\Sources\\AIload.c",
+    "target_path": "Libraries/AIinterp/Sources/AIload.c",
+    "assertions": 5,
+    "functions": 4
+  },
+  {
+    "source_path": "\\Libraries\\AIinterp\\Sources\\Categs\\AIcateg.c",
+    "target_path": "Libraries/AIinterp/Sources/Categs/AIcateg.c",
+    "assertions": 2,
+    "functions": 2
+  },
+  {
+    "source_path": "\\Libraries\\AIinterp\\Sources\\Events\\EVEinit.c",
+    "target_path": "Libraries/AIinterp/Sources/Events/EVEinit.c",
+    "assertions": 2,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\AIinterp\\Sources\\Events\\EVEplay.c",
+    "target_path": "Libraries/AIinterp/Sources/Events/EVEplay.c",
+    "assertions": 2,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\AIinterp\\Sources\\Functions\\AIfunctions_ai.c",
+    "target_path": "Libraries/AIinterp/Sources/Functions/AIfunctions_ai.c",
+    "assertions": 2,
+    "functions": 2
+  },
+  {
+    "source_path": "\\Libraries\\AIinterp\\Sources\\Functions\\AIfunctions_fact.c",
+    "target_path": "Libraries/AIinterp/Sources/Functions/AIfunctions_fact.c",
+    "assertions": 10,
+    "functions": 10
+  },
+  {
+    "source_path": "\\Libraries\\AIinterp\\Sources\\Functions\\AIfunctions_grid.c",
+    "target_path": "Libraries/AIinterp/Sources/Functions/AIfunctions_grid.c",
+    "assertions": 20,
+    "functions": 18
+  },
+  {
+    "source_path": "\\Libraries\\AIinterp\\Sources\\Functions\\AIfunctions_msg.c",
+    "target_path": "Libraries/AIinterp/Sources/Functions/AIfunctions_msg.c",
+    "assertions": 1,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\AIinterp\\Sources\\Functions\\AIfunctions_obj.c",
+    "target_path": "Libraries/AIinterp/Sources/Functions/AIfunctions_obj.c",
+    "assertions": 1,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\AIinterp\\Sources\\Functions\\AIfunctions_wor.c",
+    "target_path": "Libraries/AIinterp/Sources/Functions/AIfunctions_wor.c",
+    "assertions": 2,
+    "functions": 2
+  },
+  {
+    "source_path": "\\Libraries\\AIinterp\\Sources\\Keywords\\AIkeywords.c",
+    "target_path": "Libraries/AIinterp/Sources/Keywords/AIkeywords.c",
+    "assertions": 1,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\ENGine\\Sources\\COLlision\\COLMain.c",
+    "target_path": "Libraries/ENGine/Sources/COLlision/COLMain.c",
+    "assertions": 4,
+    "functions": 4
+  },
+  {
+    "source_path": "\\Libraries\\ENGine\\Sources\\COLlision\\COLcob.c",
+    "target_path": "Libraries/ENGine/Sources/COLlision/COLcob.c",
+    "assertions": 1,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\ENGine\\Sources\\Dare\\cvoicemanager.cpp",
+    "target_path": "Libraries/ENGine/Sources/Dare/cvoicemanager.cpp",
+    "assertions": 1,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\ENGine\\Sources\\Dare\\dareinterface.c",
+    "target_path": "Libraries/ENGine/Sources/Dare/dareinterface.c",
+    "assertions": 1,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\ENGine\\Sources\\DynamicLoading\\cLoader.cpp",
+    "target_path": "Libraries/ENGine/Sources/DynamicLoading/cLoader.cpp",
+    "assertions": 2,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\ENGine\\Sources\\GRId\\GRI_compute.c",
+    "target_path": "Libraries/ENGine/Sources/GRId/GRI_compute.c",
+    "assertions": 1,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\ENGine\\Sources\\GRId\\GRI_load.c",
+    "target_path": "Libraries/ENGine/Sources/GRId/GRI_load.c",
+    "assertions": 5,
+    "functions": 4
+  },
+  {
+    "source_path": "\\Libraries\\ENGine\\Sources\\MoDiFier\\MDFmodifier_GEN.c",
+    "target_path": "Libraries/ENGine/Sources/MoDiFier/MDFmodifier_GEN.c",
+    "assertions": 1,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\ENGine\\Sources\\MoDiFier\\MDFstruct.c",
+    "target_path": "Libraries/ENGine/Sources/MoDiFier/MDFstruct.c",
+    "assertions": 1,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\ENGine\\Sources\\MoDiFier\\Rope2D.cpp",
+    "target_path": "Libraries/ENGine/Sources/MoDiFier/Rope2D.cpp",
+    "assertions": 1,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\ENGine\\Sources\\OBJects\\OBJBoundingvolume.c",
+    "target_path": "Libraries/ENGine/Sources/OBJects/OBJBoundingvolume.c",
+    "assertions": 15,
+    "functions": 2
+  },
+  {
+    "source_path": "\\Libraries\\ENGine\\Sources\\OBJects\\OBJload.c",
+    "target_path": "Libraries/ENGine/Sources/OBJects/OBJload.c",
+    "assertions": 1,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\ENGine\\Sources\\Text\\TEXTload.c",
+    "target_path": "Libraries/ENGine/Sources/Text/TEXTload.c",
+    "assertions": 2,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\ENGine\\Sources\\WORld\\WORDynLoad.c",
+    "target_path": "Libraries/ENGine/Sources/WORld/WORDynLoad.c",
+    "assertions": 1,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\GraphicDK\\Sources\\TEXture\\TEXlist.c",
+    "target_path": "Libraries/GraphicDK/Sources/TEXture/TEXlist.c",
+    "assertions": 2,
+    "functions": 2
+  },
+  {
+    "source_path": "\\Libraries\\Sdk\\Sources\\BIGfiles\\BIGcomp.c",
+    "target_path": "Libraries/Sdk/Sources/BIGfiles/BIGcomp.c",
+    "assertions": 3,
+    "functions": 2
+  },
+  {
+    "source_path": "\\Libraries\\Sdk\\Sources\\BIGfiles\\BIGfat.c",
+    "target_path": "Libraries/Sdk/Sources/BIGfiles/BIGfat.c",
+    "assertions": 7,
+    "functions": 3
+  },
+  {
+    "source_path": "\\Libraries\\Sdk\\Sources\\BIGfiles\\BIGio.c",
+    "target_path": "Libraries/Sdk/Sources/BIGfiles/BIGio.c",
+    "assertions": 3,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\Sdk\\Sources\\BIGfiles\\BIGopen.c",
+    "target_path": "Libraries/Sdk/Sources/BIGfiles/BIGopen.c",
+    "assertions": 2,
+    "functions": 2
+  },
+  {
+    "source_path": "\\Libraries\\Sdk\\Sources\\BIGfiles\\BIGread.c",
+    "target_path": "Libraries/Sdk/Sources/BIGfiles/BIGread.c",
+    "assertions": 12,
+    "functions": 3
+  },
+  {
+    "source_path": "\\Libraries\\Sdk\\Sources\\BIGfiles\\LOAding\\LOAdefs.c",
+    "target_path": "Libraries/Sdk/Sources/BIGfiles/LOAding/LOAdefs.c",
+    "assertions": 1,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\Sdk\\Sources\\INOut\\INOjoystick.c",
+    "target_path": "Libraries/Sdk/Sources/INOut/INOjoystick.c",
+    "assertions": 1,
+    "functions": 1
+  },
+  {
+    "source_path": "\\Libraries\\Sdk\\Sources\\PackFiles\\bigfile.cpp",
+    "target_path": "Libraries/Sdk/Sources/PackFiles/bigfile.cpp",
+    "assertions": 1,
+    "functions": 1
+  }
+]
