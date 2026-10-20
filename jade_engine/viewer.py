@@ -22,10 +22,12 @@ from .animations import (
     find_character_anchor_object,
     follow_bone_world_vertices,
     get_biped_parents,
+    character_bone_parents,
     infer_character_group,
     is_character_object,
     is_environment_prop,
     is_rigid_accessory,
+    mul_matrix_col,
     object_world_matrix,
     pick_closest_gizmo,
     transform_point,
@@ -430,6 +432,8 @@ class GLViewer(QOpenGLWidget):
 
     def select_object(self, obj: Optional[LevelObject]):
         self.selected_object = obj
+        if obj is not None and self.transform_mode == "select":
+            self.transform_mode = "translate"
         self.update()
 
     def focus_object(self, obj: LevelObject):
@@ -933,22 +937,60 @@ class GLViewer(QOpenGLWidget):
         master_anim: Dict[int, Any],
         body_obj: Optional[LevelObject],
     ) -> List[Tuple[float, float, float]]:
-        """Keep modular accessories glued to the nearest rest-pose bone during animation."""
+        """Keep modular accessories glued to the appropriate bone during animation."""
         rest_world = list(transformed_vertices(mesh.vertices, obj))
         if not rest_world or not master_anim:
             return rest_world
         body_matrix = object_world_matrix(body_obj) if body_obj is not None else None
-        giz = self._accessory_bone_cache.get(mesh.key)
-        if giz not in master_anim:
-            cx = sum(v[0] for v in rest_world) / len(rest_world)
-            cy = sum(v[1] for v in rest_world) / len(rest_world)
-            cz = sum(v[2] for v in rest_world) / len(rest_world)
-            giz = pick_closest_gizmo((cx, cy, cz), master_anim, body_matrix)
-            if giz is not None:
-                self._accessory_bone_cache[mesh.key] = giz
+
+        # 1. Check explicit bone mapping by accessory name tokens
+        lower_name = f"{obj.name} {mesh.object_name or ''}".casefold()
+        giz = None
+        is_weapon = any(k in lower_name for k in ("sword", "dagger", "arme", "weapon", "blade"))
+        is_bow = any(k in lower_name for k in ("_arc", "arc_", "m_arc", "b_arc", "bow"))
+        is_arrow = any(k in lower_name for k in ("fleche", "arrow"))
+        is_head = any(k in lower_name for k in ("hair", "cheveux", "face", "yeux", "eye", "head", "eyelid", "eyebrow", "jaw", "lips"))
+        is_quiver = any(k in lower_name for k in ("carquois", "quiver"))
+
+        is_farah = any("farah" in (o.name or "").casefold() for o in self.level.objects) if self.level else False
+
+        if is_farah:
+            if is_head:
+                giz = 5   # Head
+            elif is_bow:
+                giz = 11  # L Hand
+            elif is_arrow:
+                giz = 21  # R Hand
+            elif is_quiver:
+                giz = 3   # Spine1
+        else:
+            if is_head:
+                giz = 5   # Head
+            elif is_weapon:
+                giz = 19  # Right Hand
+            elif is_quiver:
+                giz = 3   # Spine2
+
+        if giz is None or giz not in master_anim:
+            giz = self._accessory_bone_cache.get(mesh.key)
+            if giz not in master_anim:
+                cx = sum(v[0] for v in rest_world) / len(rest_world)
+                cy = sum(v[1] for v in rest_world) / len(rest_world)
+                cz = sum(v[2] for v in rest_world) / len(rest_world)
+                giz = pick_closest_gizmo((cx, cy, cz), master_anim, body_matrix)
+                if giz is not None:
+                    self._accessory_bone_cache[mesh.key] = giz
+
         pose = master_anim.get(giz) if giz is not None else None
         if not pose or len(pose) < 4 or pose[3] is None:
             return rest_world
+
+        # For unattached weapons (like sword whose rest position was on the floor at (0.5, 0, 0)),
+        # attach hilt directly to hand bone:
+        if is_weapon or is_bow:
+            hand_world = mul_matrix_col(body_matrix, pose[0]) if body_matrix is not None else pose[0]
+            return [transform_point(hand_world, v) for v in mesh.vertices]
+
         return follow_bone_world_vertices(rest_world, pose[3], pose[0], body_matrix)
 
     def _draw_bones(self):
@@ -999,7 +1041,9 @@ class GLViewer(QOpenGLWidget):
                 glEnd()
 
                 # 2. Draw bone connection links between child and parent
-                parents = get_biped_parents(target_char, len(master_anim))
+                parents = character_bone_parents(self.level, clip, target_char)
+                if not parents:
+                    parents = get_biped_parents(target_char, len(master_anim))
                 glColor4f(1.0, 0.8, 0.2, 0.85)  # Amber rig link
                 glLineWidth(2.0)
                 glBegin(GL_LINES)
@@ -1264,17 +1308,13 @@ class GLViewer(QOpenGLWidget):
         rd /= norm
 
         best_hit = None
-        min_dist = float("inf")
+        best_score = (99, float("inf"), float("inf"))
 
         for obj in self.level.objects:
             if obj.position[2] <= -20000:
                 continue
 
             cx, cy, cz = obj.position
-            center = np.array([cx, cy, cz], dtype=np.float64)
-            radius = 1.0
-
-            # Determine picking center & radius based on geometric bounds or mesh
             has_bounds = (
                 obj.bounds
                 and len(obj.bounds) == 6
@@ -1291,9 +1331,18 @@ class GLViewer(QOpenGLWidget):
                 center = np.array([cx + box_cx, cy + box_cy, cz + box_cz], dtype=np.float64)
                 radius = max(math.sqrt(bx * bx + by * by + bz * bz), 1.0)
             elif self.level.mesh_links.get(id(obj)):
+                center = np.array([cx, cy, cz], dtype=np.float64)
                 radius = 2.5
             elif obj.kind == "bone":
+                center = np.array([cx, cy, cz], dtype=np.float64)
                 radius = 0.6
+            else:
+                center = np.array([cx, cy, cz], dtype=np.float64)
+                radius = 1.0
+
+            is_char = is_character_object(obj.name)
+            is_env = radius >= 15.0 or is_environment_prop(obj.name)
+            cat = 0 if is_char else (2 if is_env else 1)
 
             # Test ray against geometry bounding sphere
             v = center - ro
@@ -1303,11 +1352,9 @@ class GLViewer(QOpenGLWidget):
                 eff_radius = max(radius, 0.8)
                 if d_sq <= eff_radius * eff_radius:
                     t_hit = t_proj - math.sqrt(max(0.0, eff_radius * eff_radius - d_sq))
-                    hit_score = t_hit
-                    if is_character_object(obj.name):
-                        hit_score -= 0.5  # Prioritize characters slightly when overlapping scene
-                    if hit_score < min_dist:
-                        min_dist = hit_score
+                    score = (cat, d_sq / (eff_radius * eff_radius), t_hit)
+                    if score < best_score:
+                        best_score = score
                         best_hit = obj
                         continue
 
@@ -1316,10 +1363,11 @@ class GLViewer(QOpenGLWidget):
             t_pivot = float(np.dot(v_pivot, rd))
             if t_pivot > 0:
                 d_sq_p = float(np.dot(v_pivot, v_pivot) - t_pivot * t_pivot)
-                if d_sq_p <= 1.2 * 1.2:
+                if d_sq_p <= 1.44:
                     t_hit_p = t_pivot - math.sqrt(max(0.0, 1.44 - d_sq_p))
-                    if t_hit_p < min_dist:
-                        min_dist = t_hit_p
+                    score_p = (cat, d_sq_p / 1.44, t_hit_p)
+                    if score_p < best_score:
+                        best_score = score_p
                         best_hit = obj
 
         return best_hit
@@ -1713,6 +1761,8 @@ class GLViewer(QOpenGLWidget):
             hit_obj = self.pick_object_at(event.pos().x(), event.pos().y())
             if hit_obj is not None:
                 self.selected_object = hit_obj
+                if self.transform_mode == "select":
+                    self.transform_mode = "translate"
                 self.object_selected.emit(hit_obj)
                 self.clicked_on_object = True
                 self.update()

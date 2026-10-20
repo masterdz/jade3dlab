@@ -175,7 +175,11 @@ def sample_track_field(keys: Tuple[AnimationKey, ...], frame: float, field: str)
 
 
 def inverse_matrix(matrix: Tuple[float, ...] | List[float]) -> List[float]:
-    """Invert 4x4 row-major / column-major affine transform matrix."""
+    """Invert a 4x4 column-major affine transform matrix (Jade engine native convention).
+
+    Column-major layout (Jade MATH_tdst_Matrix): M[col, row] = matrix[col*4+row].
+    Indices: 0-2=I-column, 4-6=J-column, 8-10=K-column, 12-14=translation T.
+    """
     rows = [[float(matrix[column * 4 + row]) for column in range(4)] +
             [float(row == column) for column in range(4)] for row in range(4)]
     for column in range(4):
@@ -248,13 +252,20 @@ def _compose_rotation_3x3(anim_rot: Tuple[float, ...], rest_local: List[float]) 
 
 
 def transform_point(matrix: Tuple[float, ...] | List[float], point: Tuple[float, float, float]) -> Tuple[float, float, float]:
-    """Transform a 3D point by 4x4 matrix."""
+    """Transform a 3D point by a 4x4 column-major matrix (Jade engine native convention).
+
+    Column-major layout: M[col, row] = matrix[col*4+row]. Translation at indices 12,13,14.
+    """
     return tuple(sum(matrix[column * 4 + row] * point[column] for column in range(3)) + matrix[12 + row]
                  for row in range(3))
 
 
 def quat_to_matrix(q: Tuple[float, float, float, float]) -> Tuple[float, ...]:
-    """Convert quaternion (x, y, z, w) to 4x4 column-major rotation matrix."""
+    """Convert quaternion (x, y, z, w) to a 4x4 column-major rotation matrix.
+
+    Matches Jade MATH_ConvertQuaternionToMatrix exactly (MATHmatrixAdvanced.c:528).
+    Column-major: indices 0,1,2=I-column; 4,5,6=J-column; 8,9,10=K-column; 12-14=0.
+    """
     x, y, z, w = q
     return (
         1.0 - 2.0 * (y * y + z * z), 2.0 * (x * y + z * w), 2.0 * (x * z - y * w), 0.0,
@@ -298,14 +309,86 @@ MASTER_BIPED_PARENTS: Dict[int, int] = {
     30: 0, 31: 30, 32: 31, 33: 32,
 }
 
-FARAH_BIPED_PARENTS: Dict[int, int] = {
-    1: 0, 2: 1, 3: 2, 4: 3,
-    5: 2, 6: 5, 7: 6, 8: 7, 9: 8, 10: 9, 11: 8, 12: 11,
-    13: 2, 14: 13, 15: 14, 16: 15, 17: 16, 18: 17, 19: 16, 20: 19,
-    21: 0, 22: 21, 23: 22, 24: 23,
-    25: 0, 26: 25, 27: 26, 28: 27,
-    29: 4, 30: 29, 31: 0, 32: 0, 33: 0, 34: 0, 35: 2,
+# Farah SkinBone index (0..35) to TRL Animation Gizmo index (1..35)
+FARAH_GIZMO_MAP: List[int] = [
+    1,   # 0: Pelvis -> Gizmo 1
+    2,   # 1: Spine -> Gizmo 2
+    3,   # 2: Spine1 -> Gizmo 3
+    4,   # 3: Neck -> Gizmo 4
+    5,   # 4: Head -> Gizmo 5
+    8,   # 5: L Clavicle -> Gizmo 8
+    9,   # 6: L UpperArm -> Gizmo 9
+    10,  # 7: L Forearm -> Gizmo 10
+    11,  # 8: L Hand -> Gizmo 11
+    12,  # 9: L Finger0 -> Gizmo 12
+    13,  # 10: L Finger01 -> Gizmo 13
+    14,  # 11: L Finger1 -> Gizmo 14
+    15,  # 12: L Finger11 -> Gizmo 15
+    18,  # 13: R Clavicle -> Gizmo 18
+    19,  # 14: R UpperArm -> Gizmo 19
+    20,  # 15: R Forearm -> Gizmo 20
+    21,  # 16: R Hand -> Gizmo 21
+    22,  # 17: R Finger0 -> Gizmo 22
+    23,  # 18: R Finger01 -> Gizmo 23
+    24,  # 19: R Finger1 -> Gizmo 24
+    25,  # 20: R Finger11 -> Gizmo 25
+    26,  # 21: L Thigh -> Gizmo 26
+    27,  # 22: L Calf -> Gizmo 27
+    28,  # 23: L Foot -> Gizmo 28
+    29,  # 24: L Toe0 -> Gizmo 29
+    30,  # 25: R Thigh -> Gizmo 30
+    31,  # 26: R Calf -> Gizmo 31
+    32,  # 27: R Foot -> Gizmo 32
+    33,  # 28: R Toe0 -> Gizmo 33
+    3,   # 29: Quiver root -> follows Spine1 (Gizmo 3)
+    6,   # 30: Ponytail1 -> Gizmo 6
+    26,  # 31: Skirt BackLeft -> follows L Thigh (Gizmo 26)
+    30,  # 32: Skirt BackRight -> follows R Thigh (Gizmo 30)
+    26,  # 33: Skirt FrontLeft -> follows L Thigh (Gizmo 26)
+    30,  # 34: Skirt FrontRight -> follows R Thigh (Gizmo 30)
+    35,  # 35: Breast -> Gizmo 35
+]
+
+FARAH_GIZMO_PARENTS: Dict[int, int] = {
+    1: 0,   # Pelvis -> Actor Root 0
+    2: 1,   # Spine -> Pelvis
+    3: 2,   # Spine1 -> Spine
+    4: 3,   # Neck -> Spine1
+    5: 4,   # Head -> Neck
+    6: 5,   # Ponytail1 -> Head
+    7: 6,   # Ponytail11 -> Ponytail1
+    8: 3,   # L Clavicle -> Spine1
+    9: 8,   # L UpperArm -> L Clavicle
+    10: 9,  # L Forearm -> L UpperArm
+    11: 10, # L Hand -> L Forearm
+    12: 11, # L Finger0 -> L Hand
+    13: 12, # L Finger01 -> L Finger0
+    14: 11, # L Finger1 -> L Hand
+    15: 14, # L Finger11 -> L Finger1
+    16: 11, # Bow -> L Hand
+    17: 16, # Bow string -> Bow
+    18: 3,  # R Clavicle -> Spine1
+    19: 18, # R UpperArm -> R Clavicle
+    20: 19, # R Forearm -> R UpperArm
+    21: 20, # R Hand -> R Forearm
+    22: 21, # R Finger0 -> R Hand
+    23: 22, # R Finger01 -> R Finger0
+    24: 21, # R Finger1 -> R Hand
+    25: 24, # R Finger11 -> R Finger1
+    26: 1,  # L Thigh -> Pelvis 1
+    27: 26, # L Calf -> L Thigh
+    28: 27, # L Foot -> L Calf
+    29: 28, # L Toe0 -> L Foot
+    30: 1,  # R Thigh -> Pelvis 1
+    31: 30, # R Calf -> R Thigh
+    32: 31, # R Foot -> R Calf
+    33: 32, # R Toe0 -> R Foot
+    34: 21, # Arrow -> R Hand 21
+    35: 3,  # Breast -> Spine1 3
 }
+
+FARAH_BIPED_PARENTS: Dict[int, int] = FARAH_GIZMO_PARENTS
+
 
 ENVIRONMENT_PROP_KEYWORDS: Tuple[str, ...] = (
     "palmier", "feuille", "arbre", "tree", "plant", "herbe", "grass", "vegetation",
@@ -394,6 +477,228 @@ def follow_bone_world_vertices(
     except ValueError:
         return list(rest_world_verts)
     return [transform_point(glue, vertex) for vertex in rest_world_verts]
+
+
+def _matrix_from_object(obj) -> Tuple[float, ...]:
+    """Rebuild a Jade row-major local matrix from a .gao bone GameObject."""
+    basis = obj.basis
+    raw = getattr(obj, "raw_scale", (1.0, 1.0, 1.0))
+    px, py, pz = obj.position
+    return (
+        basis[0][0], basis[0][1], basis[0][2], raw[0],
+        basis[1][0], basis[1][1], basis[1][2], raw[1],
+        basis[2][0], basis[2][1], basis[2][2], raw[2],
+        px, py, pz, 1.0,
+    )
+
+
+def _matrices_close(a, b, tol: float = 5e-3) -> bool:
+    """Compare the 3x3 basis and the translation of two Jade matrices."""
+    for i in (0, 1, 2, 4, 5, 6, 8, 9, 10):
+        if abs(a[i] - b[i]) > tol:
+            return False
+    for i in (12, 13, 14):
+        if abs(a[i] - b[i]) > tol:
+            return False
+    return True
+
+
+def derive_character_rig(
+    level,
+    character_hint: str,
+    skin_bones,
+    bind_worlds: Dict[int, Tuple[float, ...]],
+) -> Tuple[Dict[int, int], Dict[int, int]]:
+    """Derive a character's bone hierarchy and TRL gizmo mapping from game data.
+
+    The retail rig is a chain of "B_<name> *.gao" GameObjects that carries the
+    rest-pose local matrix of every bone.  The skinned mesh stores the inverse
+    bind matrix of every bone it is weighted to.  Comparing the two reveals
+    both the parent of every bone and which TRL gizmo drives it, because the
+    gizmo numbering follows the .gao chain (gizmo 0 is the actor root node,
+    which sits above the first skinned bone).
+
+    Returns (parents, gizmo_of_bone) or ({}, {}) when the rig cannot be resolved.
+    """
+    hint = (character_hint or "").casefold()
+    chain = [obj for obj in level.objects
+             if (obj.name or "").casefold().startswith("b_")
+             and (not hint or hint in (obj.name or "").casefold())]
+    if len(chain) < 2 or not skin_bones or not bind_worlds:
+        return {}, {}
+
+    chain_locals = [_matrix_from_object(obj) for obj in chain]
+
+    # Bind-space world matrix of every skinned bone.
+    inv_world = {}
+    for index, world in bind_worlds.items():
+        try:
+            inv_world[index] = inverse_matrix(world)
+        except ValueError:
+            continue
+    if not inv_world:
+        return {}, {}
+
+    # Candidate parent/child relations: local = inv(world_parent) * world_child.
+    # Match that local against the .gao chain to identify the bone and its node.
+    parents: Dict[int, int] = {}
+    node_of: Dict[int, int] = {}
+
+    def creates_cycle(bone: int, parent: int) -> bool:
+        seen = {bone}
+        node = parent
+        while node is not None:
+            if node in seen:
+                return True
+            seen.add(node)
+            node = parents.get(node)
+        return False
+
+    for child, world in bind_worlds.items():
+        for parent, inv in inv_world.items():
+            if parent == child:
+                continue
+            # local = world_child * inverse(world_parent)
+            local = mul_matrix(world, inv)
+            for node, chain_local in enumerate(chain_locals):
+                if _matrices_close(local, chain_local):
+                    parents[child] = parent
+                    node_of[child] = node
+                    break
+            if child in parents:
+                break
+
+    # Accessory bones (hair, quiver, skirt roots) keep their own local frame in
+    # the .gao data, so their transforms do not match the bind matrices
+    # exactly.  Resolve them with a relaxed match, then fall back to the
+    # closest already resolved bone.
+    if len(parents) < len(bind_worlds):
+        for child, world in bind_worlds.items():
+            if child in parents:
+                continue
+            best = None
+            for parent, inv in inv_world.items():
+                if parent == child:
+                    continue
+                local = mul_matrix(world, inv)
+                for node, chain_local in enumerate(chain_locals):
+                    diff = max(abs(local[i] - chain_local[i])
+                               for i in (0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14))
+                    if best is None or diff < best[0]:
+                        best = (diff, parent, node)
+            if best and best[0] < 0.25 and not creates_cycle(child, best[1]):
+                parents[child] = best[1]
+                node_of[child] = best[2]
+
+    if len(parents) < len(bind_worlds) and parents:
+        resolved = list(parents)
+        for child, world in bind_worlds.items():
+            if child in parents:
+                continue
+            pos = world[12:15]
+            best = None
+            for parent in resolved:
+                if creates_cycle(child, parent):
+                    continue
+                ppos = bind_worlds[parent][12:15]
+                d = sum((pos[i] - ppos[i]) ** 2 for i in range(3))
+                if best is None or d < best[0]:
+                    best = (d, parent)
+            if best:
+                parents[child] = best[1]
+
+    if len(parents) < 2:
+        return {}, {}
+
+    # Break any parent cycle introduced by the relaxed matching: a bone whose
+    # parent chain loops back onto itself becomes a root.
+    for bone in list(parents):
+        seen = {bone}
+        node = parents[bone]
+        while node is not None and node in parents:
+            if node in seen:
+                parents[bone] = None
+                break
+            seen.add(node)
+            node = parents.get(node)
+    parents = {b: p for b, p in parents.items() if p is not None}
+
+    if len(parents) < 2:
+        return {}, {}
+
+    gizmo_of = {bone: node for bone, node in node_of.items()}
+    return parents, gizmo_of
+
+
+def detect_gizmo_offset(
+    level,
+    clip: AnimationClip,
+    mesh,
+    rest: Dict[int, Any],
+    parents: Dict[int, int],
+    candidates: Tuple[int, ...] = (-3, -2, -1, 0, 1),
+) -> int:
+    """Find the offset between TRL gizmo ids and skinned bone indices.
+
+    The TRL gizmo numbering is the retail bone order, which starts one node
+    above the first skinned bone (the actor root), so the gizmo of a bone is
+    normally its skin index plus one.  The offset is verified empirically: a
+    correct offset makes the animated local orientations stay close to their
+    rest-pose local orientations, while a wrong one applies unrelated
+    rotations to the bones and tears the rig apart.
+    """
+    bone_indices = [b.index for b in (getattr(mesh, "skin_bones", None) or [])]
+    if not bone_indices:
+        return 0
+    rest_world = {i: rest[i][0] for i in rest if i in bone_indices}
+
+    local_bind: Dict[int, Tuple[float, ...]] = {}
+    for g in sorted(rest_world):
+        p = parents.get(g)
+        local_bind[g] = (mul_matrix(rest_world[g], rest[p][3])
+                         if (p is not None and p in rest_world and p != g) else rest_world[g])
+
+    frames = [0, max(1, clip.frames // 3), max(1, (2 * clip.frames) // 3)]
+    best = None
+    for offset in candidates:
+        # Gizmo 0 is the actor root node; it drives no skinned bone, so it is
+        # excluded from both the mapping and the count.
+        mapped = 0
+        for track in clip.tracks:
+            if track.gizmo == 0xFFFF or track.gizmo == 0:
+                continue
+            bone = track.gizmo + offset
+            if bone in rest_world:
+                mapped += 1
+        if not mapped:
+            continue
+
+        deviation = 0.0
+        samples = 0
+        for frame in frames:
+            if frame >= clip.frames:
+                continue
+            for track in clip.tracks:
+                if track.gizmo == 0xFFFF or track.gizmo == 0:
+                    continue
+                bone = track.gizmo + offset
+                if bone not in rest_world:
+                    continue
+                r = sample_track_field(track.keys, float(frame), "rotation")
+                if r is None:
+                    continue
+                rm = quat_to_matrix(r)
+                lb = local_bind[bone]
+                for i in (0, 1, 2, 4, 5, 6, 8, 9, 10):
+                    deviation += (rm[i] - lb[i]) ** 2
+                samples += 1
+        if not samples:
+            continue
+        score = (deviation / samples, -mapped)
+        if best is None or score < best[0]:
+            best = (score, offset)
+
+    return best[1] if best else 0
 
 
 def pick_closest_gizmo(
@@ -634,6 +939,73 @@ PRINCE_MESH_CONFIGS: Dict[str, Dict[str, Any]] = {
 }
 
 
+_gizmo_offset_cache: Dict[Tuple[int, str], Tuple[int, int]] = {}
+
+
+def character_bone_parents(level, clip: AnimationClip, target_character: str = "") -> Dict[int, int]:
+    """Return the bone hierarchy used to pose a character, for rig drawing.
+
+    Mirrors the hierarchy selection inside compute_character_skeleton_poses so
+    that the drawn rig links always match the animated skeleton.
+    """
+    low = (target_character or "").casefold()
+    if "farah" in low:
+        return dict(FARAH_GIZMO_PARENTS)
+    if "prince" in low:
+        return dict(MASTER_BIPED_PARENTS)
+    rest: Dict[int, Any] = {}
+    for obj in level.objects:
+        if obj.kind == "bone" or (obj.name or "").startswith("B_"):
+            continue
+        lower = (obj.name or "").casefold()
+        if low and low not in lower:
+            continue
+        for mk in level.mesh_links.get(id(obj), []):
+            mesh = level.meshes.get(mk)
+            if mesh is None or not mesh.skin_bones:
+                continue
+            built = build_skin_rest(mesh)
+            for b in mesh.skin_bones:
+                if b.index not in rest and b.index in built:
+                    rest[b.index] = built[b.index]
+    if not rest:
+        return {}
+    derived, _ = derive_character_rig(
+        level, low, list(rest), {i: rest[i][0] for i in rest})
+    if derived and len(derived) >= max(2, len(rest) // 2):
+        return derived
+    if "farah" in low:
+        return dict(FARAH_BIPED_PARENTS)
+    return infer_biped_parents_from_bind({i: rest[i] for i in rest})
+
+
+def _detect_gizmo_offset_from_skeleton(level, character_hint: str, rest: Dict[int, Any]) -> int:
+    """Determine gizmo offset by locating the pelvis/root bone in the level B_<char> object list.
+
+    The TRL gizmo index is the position of a bone's GameObject in the level object list
+    (0-indexed).  Bone index 0 in the IBM is the pelvis/root — we find its position in the
+    level list by matching the bone name and return -(that index) as the offset so that
+    bone = gizmo + offset.  Returns 0 if the pelvis cannot be located.
+    """
+    hint = (character_hint or "").casefold()
+    # Collect B_<char> skeleton objects in level order
+    bone_gaos = [o for o in level.objects if (o.name or "").casefold().startswith("b_")
+                 and (not hint or hint in (o.name or "").casefold())]
+    if len(bone_gaos) < 2 or not rest:
+        return 0
+
+    # IBM bone 0 is always the root/pelvis. Find it in the level-order list by name.
+    pelvis_keywords = ("pelvis", "bip01", "root", "hip", "hanche")
+    for gi, o in enumerate(bone_gaos):
+        low = (o.name or "").casefold()
+        if any(k in low for k in pelvis_keywords):
+            # gizmo gi corresponds to bone index 0, so bone = gizmo + offset → offset = 0 - gi
+            return -gi
+
+    return 0
+
+
+
 def compute_character_skeleton_poses(
     level,
     clip: AnimationClip,
@@ -693,10 +1065,17 @@ def compute_character_skeleton_poses(
 
             skinned_meshes.append((obj, m, lower_obj, lower_m))
 
-    # Prioritize Prince modular body parts: plate_body (torso anchor) first, then legs, then sleeves
+    # Prioritize body meshes first (anchor for skeleton), then modular parts, then accessories.
+    # Face/hair/accessory meshes must NOT pollute the master bind even for Farah.
     def _mesh_priority(item):
         comb = item[3] + " " + item[2]
-        if "farah_body" in comb or ("farah" in comb and "body" in comb and "hair" not in comb and "face" not in comb):
+        # Face, hair, and facial accessories get very low priority (high number)
+        # so they never overwrite body bone bind matrices in master_bind.
+        if any(k in comb for k in ("face", "hair", "cheveux", "yeux", "eyelid",
+                                   "ponytail", "carquois", "medaillon", "fleche",
+                                   "breast", "veil", "voile")):
+            return 100
+        if "farah_body" in comb or ("farah" in comb and "body" in comb):
             return -1
         if "plate_body" in comb:
             return 0
@@ -724,8 +1103,14 @@ def compute_character_skeleton_poses(
                     giz = gmap[b.index]
                     if giz not in master_bind and b.index in rest:
                         master_bind[giz] = rest[b.index]
+        elif "farah" in lower_obj or "farah" in lower_m or target_character == "farah":
+            for b in m.skin_bones:
+                if b.index < len(FARAH_GIZMO_MAP):
+                    giz = FARAH_GIZMO_MAP[b.index]
+                    if giz not in master_bind and b.index in rest:
+                        master_bind[giz] = rest[b.index]
         else:
-            # Unified character mesh (Farah, SandGuard, Pirate, Initiate, etc.)
+            # Unified character mesh (SandGuard, Pirate, Initiate, etc.)
             for b in m.skin_bones:
                 if b.index not in master_bind and b.index in rest:
                     master_bind[b.index] = rest[b.index]
@@ -734,12 +1119,26 @@ def compute_character_skeleton_poses(
         return {}
 
     low_char = (char_name or target_character or "").casefold()
+
     if "farah" in low_char or target_character == "farah":
-        parents = infer_biped_parents_from_bind(master_bind)
-    elif target_character == "prince" or _is_prince_modular_mesh(char_name, char_name):
-        parents = get_biped_parents("prince", len(master_bind))
+        parents = dict(FARAH_GIZMO_PARENTS)
+        if 0 not in master_bind:
+            ident = (1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+            master_bind[0] = (ident, (0.0, 0.0, 0.0), [], list(ident))
+        gizmo_offset = 0
     else:
-        parents = infer_biped_parents_from_bind(master_bind)
+        derived_parents, _gizmo_of = derive_character_rig(
+            level, low_char,
+            skin_bones=[b.index for b in skinned_meshes[0][1].skin_bones] if skinned_meshes else [],
+            bind_worlds={i: rest[i][0] for i in rest},
+        )
+        if derived_parents and len(derived_parents) >= max(2, len(master_bind) // 2):
+            parents = derived_parents
+        elif target_character == "prince" or _is_prince_modular_mesh(char_name, char_name):
+            parents = get_biped_parents("prince", len(master_bind))
+        else:
+            parents = infer_biped_parents_from_bind(master_bind)
+        gizmo_offset = 0
 
     # 2. Precompute rest-pose local transform matrices: local_bind[g] = child_bind * inv(parent_bind)
     local_bind: Dict[int, Tuple[float, ...]] = {}
@@ -751,7 +1150,7 @@ def compute_character_skeleton_poses(
         else:
             local_bind[g] = master_bind[g][0]
 
-    # 3. Sample clip rotation & root translation tracks at current frame
+    # 3. Sample clip rotation & root translation tracks at current frame.
     rotations: Dict[int, Optional[Tuple[float, float, float, float]]] = {}
     root_trans: Optional[Tuple[float, float, float]] = None
     root_trans_0: Optional[Tuple[float, float, float]] = None
@@ -759,8 +1158,9 @@ def compute_character_skeleton_poses(
         if track.gizmo == 0xFFFF:
             continue
         rot = sample_track_field(track.keys, frame, "rotation")
-        if rot is not None and track.gizmo not in rotations:
-            rotations[track.gizmo] = rot
+        bone = track.gizmo + gizmo_offset
+        if rot is not None and bone in master_bind and bone not in rotations:
+            rotations[bone] = rot
         if track.gizmo == 0:
             t = sample_track_field(track.keys, frame, "translation")
             if t is not None:
@@ -788,12 +1188,14 @@ def compute_character_skeleton_poses(
         p_world = world_pose(p) if (p is not None and p in master_bind and p != giz) else None
 
         r = rotations.get(giz)
-        r_mat = quat_to_matrix(r) if r else _IDENTITY
         loc = list(local_bind[giz])
 
-        # Track orientation directly sets local bone rotation (EVEnt_interpolationkey.c:1594)
+        # The TRL quaternion directly stores the bone's local orientation for this frame
+        # (MATH_Copy33Matrix into st_LocalMatrix, EVEnt_interpolationkey.c:1594).
+        # Replace the rotation 3x3; the rest-pose translation stays in local_bind.
         if r:
-            loc[:12] = r_mat[:12]
+            r_mat = quat_to_matrix(r)
+            loc[:12] = list(r_mat[:12])
 
         if p_world is None:
             # Root pelvis translation
@@ -872,12 +1274,12 @@ def compute_bone_poses(
 
         giz = gizmo_map[idx] if (gizmo_map is not None and idx < len(gizmo_map)) else idx
         r = rotations.get(giz) if giz is not None else None
-        r_mat = quat_to_matrix(r) if r else _IDENTITY
         loc = list(local_bind[idx])
 
-        # Track orientation directly sets local bone rotation
+        # TRL quaternion directly stores the bone's absolute local orientation.
         if r:
-            loc[:12] = r_mat[:12]
+            r_mat = quat_to_matrix(r)
+            loc[:12] = list(r_mat[:12])
 
         if p_world is None:
             if root_trans and root_trans_0:
@@ -927,14 +1329,16 @@ def pose_mesh_vertices(
                 matched_cfg = cfg
                 break
 
+    is_farah = "farah" in lower_name or "farah" in (getattr(mesh, "name", "") or "").casefold()
+
     if master_anim is None:
         if level is not None:
             master_anim = compute_character_skeleton_poses(level, clip, frame)
         else:
-            gmap = matched_cfg["gizmo_map"] if matched_cfg else None
+            gmap = matched_cfg["gizmo_map"] if matched_cfg else (FARAH_GIZMO_MAP if is_farah else None)
             return mesh.vertices
 
-    gmap = matched_cfg["gizmo_map"] if matched_cfg else None
+    gmap = matched_cfg["gizmo_map"] if matched_cfg else (FARAH_GIZMO_MAP if is_farah else None)
     hmap = matched_cfg.get("helper_map", {}) if matched_cfg else {}
 
     sums = [[0.0, 0.0, 0.0, 0.0] for _ in mesh.vertices]
@@ -972,10 +1376,37 @@ def pose_mesh_vertices(
                 acc[i] += weight * target[i]
             acc[3] += weight
 
-    return [
-        tuple((acc[i] + orig[i] * max(0.0, 1.0 - acc[3])) / max(1.0, acc[3]) for i in range(3))
-        if acc[3] else orig
-        for orig, acc in zip(mesh.vertices, sums)
-    ]
+    # Standard linear blend skinning: divide by the accumulated weight so the
+    # result is independent of how the influences are distributed.
+    # CRITICAL FIX: For vertices with no weights, we must use the rest-pose position
+    # transformed to world space using an appropriate bone transform, NOT the
+    # local mesh vertex which causes T-pose deformation during animation.
+    fallback_transform = None
+    if rest and master_anim:
+        # Try to find the root/pelvis bone (typically bone 0 or 1) for unweighted vertices
+        # This ensures the entire mesh moves with the character's body
+        for candidate_bone in [0, 1]:
+            if candidate_bone in rest and candidate_bone in master_anim:
+                fallback_transform = master_anim[candidate_bone][0]
+                break
+        # If no root bone found, use the first available bone
+        if fallback_transform is None:
+            first_bone_idx = next(iter(rest.keys()), None)
+            if first_bone_idx is not None and first_bone_idx in master_anim:
+                fallback_transform = master_anim[first_bone_idx][0]
+    
+    result = []
+    for orig, acc in zip(mesh.vertices, sums):
+        if acc[3] > 1e-6:
+            # Vertex has bone weights - use standard LBS
+            result.append(tuple(acc[i] / acc[3] for i in range(3)))
+        elif fallback_transform is not None:
+            # Vertex has no weights - transform by root bone to stay attached to skeleton
+            result.append(transform_point(fallback_transform, orig))
+        else:
+            # No bones available - keep original vertex (shouldn't happen for skinned mesh)
+            result.append(orig)
+    
+    return result
 
 

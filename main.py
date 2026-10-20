@@ -1998,6 +1998,10 @@ class LevelEditor(QMainWindow):
         if self.viewer.selected_object is not obj:
             self.viewer.selected_object = obj
 
+        if self.btn_tool_select.isChecked():
+            self.btn_tool_move.setChecked(True)
+            self.viewer.set_transform_mode("translate")
+
         self._sync_inspector_values(obj)
 
         info = [
