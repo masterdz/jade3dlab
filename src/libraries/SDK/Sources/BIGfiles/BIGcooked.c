@@ -12,8 +12,12 @@
 #include "BIGfiles/BIGread.h"
 #include "BIGfiles/BIGkey.h"
 #include "BIGfiles/BIGfat.h"
+#include "BIGfiles/BIGio.h"
 #include "BIGfiles/BIGspecial.h"
 #include "BIGfiles/VERsion/VERsion_Number.h"
+
+#define SeekSeek(a, b, c)   L_fseek(a, b, c)
+#define ReadRead(a, b, c)   BIG_fread(a, b, c)
 
 #define BIG_COOKED_HASH_SIZE    65536
 #define BIG_COOKED_HASH_MASK    (BIG_COOKED_HASH_SIZE - 1)
