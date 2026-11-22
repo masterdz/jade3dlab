@@ -1,0 +1,62 @@
+name: Build Release (Windows MSVC x86)
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+env:
+  BUILD_TYPE: Release
+  CMAKE_GENERATOR: "Visual Studio 17 2022"
+  CMAKE_ARCH: "Win32"
+  PROJECT_NAME: Jaded
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - uses: actions/checkout@v2.4.0
+
+      - name: 'Setup MSBuild'
+        uses: microsoft/setup-msbuild@v2
+        with:
+          vs-prerelease: false
+
+      - name: Configure CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G "%CMAKE_GENERATOR%" -A "%CMAKE_ARCH%"
+
+      - name: Build Project
+        run: |
+          cd build
+          cmake --build . --config %BUILD_TYPE% --target %PROJECT_NAME% --parallel 8
+
+      - name: 'Check for commit number'
+        if: github.event_name != 'pull_request'
+        run: echo "COMMIT_COUNT=$(git rev-list --count HEAD)" >> %GITHUB_ENV%
+
+      - name: 'Package Release'
+        if: github.event_name != 'pull_request'
+        run: zip -9 jaded-release.zip runtime/* runtime/mappings/* changes.txt
+
+      - name: 'Upload to Discord'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        uses: tsickert/discord-webhook@v5.3.0
+        continue-on-error: true
+        with:
+          webhook-url: ${{ secrets.DISCORD }}
+          filename: web/releases/jaded-release.zip
+
+      - name: 'Upload Artifact'
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: jaded-release
+          path: jaded-release.zip
+          retention-days: 30

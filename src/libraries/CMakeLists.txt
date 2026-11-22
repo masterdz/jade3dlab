@@ -1,0 +1,10 @@
+include_directories(GraphicDK/Sources)
+
+add_subdirectory(core)
+add_subdirectory(SDK)
+add_subdirectory(ENGine)
+add_subdirectory(EDItors)
+add_subdirectory(AIinterp)
+add_subdirectory(GraphicDK)
+add_subdirectory(NETwork)
+add_subdirectory(SouND)

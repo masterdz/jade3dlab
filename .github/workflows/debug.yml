@@ -1,0 +1,59 @@
+name: Build Debug (Windows MSVC x86)
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - master
+      - develop
+      - 'feature/**'
+      - 'jaded-**'
+
+env:
+  BUILD_TYPE: Debug
+  CMAKE_GENERATOR: "Visual Studio 17 2022"
+  CMAKE_ARCH: "Win32"
+  PROJECT_NAME: Jaded
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - uses: actions/checkout@v4
+      - name: 'Setup MSBuild'
+        uses: microsoft/setup-msbuild@v2
+        with:
+          vs-prerelease: false
+
+      - name: Configure CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G "%CMAKE_GENERATOR%" -A "%CMAKE_ARCH%" -D CMAKE_BUILD_TYPE=Debug
+
+      - name: Build Project
+        run: |
+          cd build
+          cmake --build . --config %BUILD_TYPE% --target %PROJECT_NAME% --parallel 8
+
+      - name: 'Package Debug Build'
+        run: zip -9 jaded-debug.zip runtime/* runtime/mappings/* changes.txt
+
+      #- name: 'Upload to Discord'
+      #  if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+      #  uses: tsickert/discord-webhook@v5.3.0
+      #  continue-on-error: true
+      #  with:
+      #    webhook-url: ${{ secrets.DISCORD }}
+      #    filename: web/releases/jaded-debug.zip
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: jaded-debug
+          path: jaded-debug.zip
+          retention-days: 30

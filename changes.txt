@@ -1,0 +1,193 @@
+Jaded - Community Patched Jade Engine
+	Discord:	hogsy
+	Mastodon:	@hogsy@mastodon.social
+	Bluesky:	@hogsy.me
+-----------------------------------------------------------
+
+2026-07-12 (v0.4.1)
+- Added '/legacy' argument which can be used if you're loading the original leaked BF (#62) (hogsy)
+- Fixed memory alloc error message displaying requested block size incorrectly (bc4cdc1) (hogsy)
+- Fixed crash on script error caused by an invalid object (11086f2) (hogsy)
+- Fixed crash when spawning into a level with BGE water (#65) (hogsy)
+- Fixed a few possible collision related issues (ebb6866) (Droolie)
+- Removed crash reporting utility due to abuse (hogsy)
+
+2026-01-18 (v0.4.0)
+Huge thanks to ShowinGrowin and solemnwarning for contributing to this release!
+- Added an option to export models to Valve's SMD format (this currently excludes bones + animations). (hogsy)
+- Added '/profile' argument; disables the fps cap on launch for profiling. (hogsy)
+- Added '/uncap' argument; disables the fps cap, without enabling the profiling. (hogsy)
+- Added crash reporter (solemnwarning)
+- Migrated to SDL3. (hogsy)
+- Editor no longer closes if there's an error with loading a big file. (hogsy)
+- Updated some open/save dialogs in the editor to use the standard MFC dialog. (hogsy)
+- Script error pop-ups are now an opt-in feature via '/popuperror'. (ShowinGrowin)
+- Integrated ImGui for use as an in-game profiler. (hogsy)
+- Made script error reporting more verbose. (hogsy)
+- Big File to load can now be specified using '/bf'. (hogsy)
+- Resizable window is now supported (hogsy)
+- Editor is now available in release builds (hogsy)
+- Disabled audio effects for now, due to their buggy implementation (hogsy)
+- Fixed a number of potential buffer-overflows, which may improve stability (hogsy)
+- Fixed script compiler randomly failing (https://github.com/hogsy/jaded/issues/53) (hogsy)
+- Fixed cases where speed cap didn't work, again (https://github.com/hogsy/jaded/issues/13) (hogsy)
+- Fixed the game appearing to run really quickly in some instances, even with the speed limit enabled (hogsy + solemnwarning)
+- Fixed pixel-format setup sometimes resulting in a low-precision depth buffer (hogsy)
+- Fixed missing audio in game mode (hogsy)
+- Fixed an incorrect warning relating to sound initialisation. (hogsy)
+- Fixed a possible error being thrown in relation to audio effects, due to uninitialized variable (hogsy)
+- Fixed some memory-related crashes when running the release build. (hogsy)
+- Fixed animation graph displaying when 3D view is no longer visible. (hogsy)
+- Fixed floating panels in editor. (hogsy)
+- Fixed an edge case where launching from a different working directory could stop the controller mappings from being picked up. (hogsy)
+- Fixed crash when GLEW_EXT_framebuffer_object isn't available. (solemnwarning)
+- Fixed AfterDisplay being called before BeforeDisplay in some situations. Not sure why they were doing this... (hogsy)
+    ~ This also rectifies a flickering effect seen when switching transform modes in the 3D view
+
+2024-02-10 (v0.3.0)
+- Jaded will now launch directly into the game, use '/editor' launch argument to start with editor (https://github.com/hogsy/jaded/issues/8)
+	+ Added '/console' launch option, which will show an external console window for debugging/troubleshooting without the editor
+	+ Added '/width <value>' and '/height <value>' which can be used to force a specific width/height for the game window
+	~ Sound doesn't currently work outside the editor and some textures may display incorrectly
+- Performance has been significantly improved with framerate cap enabled (https://github.com/hogsy/jaded/issues/10)
+- Added error alerts on MAD file read failure
+- Added shortcut under Help menu to submit a bug report
+- Added some additional modifiers that weren't available before
+- Added experimental support for PNG, PSD and GIF formats
+	~ In the next release, these will be converted to TEX on import instead, rather than the native support I've done here
+- Fixed a regression that resulted in a crash when applying an OMD onto an object (https://github.com/hogsy/jaded/issues/37)
+- Fixed crash when importing TGA using RLE compression (https://github.com/hogsy/jaded/issues/38)
+- Fixed crash when exporting some skinned meshes
+- Fixed crash when opening some worlds in the editor
+- Fixed a crash that resulted from draw requests before certain elements were initialized
+- Fixed crash if user attempts to list unused GAOs without loading world first
+- Fixed memory leak in MAD exporter (https://github.com/hogsy/jaded/issues/27)
+- Fixed invalid uses of GL_CLAMP instead of GL_CLAMP_TO_EDGE for texture wrap
+- Bumped shadow-map resolution to 512 on request (please use sparingly for now, this needs optimising...) (https://github.com/hogsy/jaded/issues/36)
+- If a resource fails to export, it will no longer abort the rest of the export
+- Significant operations will now automatically display a notice in the log/console on completion
+- Invalid visual error will only display once per object (https://github.com/hogsy/jaded/issues/30)
+- Enabled support for audio effects (reverb, etc.); this depends on hardware support, or you can try using a wrapper
+- Default export path is now relative to the current working directory (<dir>/exports)
+	~ You'll need to create the 'exports' directory if it doesn't exist, of course (or just choose a different directory)
+- Clamped maximum MSAA samples to 4 for now, until we have a proper way to set this
+- Removed DirectX 8 renderer (https://github.com/hogsy/jaded/issues/24)
+- Removed P4 library dependencies
+
+2023-07-23 (v0.2.0)
+- Added support for anisotropic filtering (automatically used if texture is using mipmaps w/ max supported samples)
+- Added 'legal.txt' that includes a disclaimer, and legal notices for other libraries we're using (or will be using)
+- Fixed "Export World To Mad..." option causing a crash (https://github.com/OldTimes-Software/jaded/issues/2)
+	~ There appears to be a memory fault when exporting multiple times, will look into this for the next release
+- Fixed several dozen potential buffer-overflows
+- Fixed audio subsystem not initialising again until restart when switching between projects
+- Fixed an issue with blurry textures resulting from very pessimistic assumptions about available VRAM/RAM
+- Fixed a crash that occurred when attempting to clean up an object that wasn't loaded correctly
+- Fixed additional flags (such as fur) getting cleared when opening material in editor (https://github.com/OldTimes-Software/jaded/issues/28)
+- Fixed a case where the input handling would interpret a key as always being active, causing controller input to cease working
+- Reintroduced script checks, but clicking 'Cancel' will now ignore the error and attempt to continue limping along (at your own peril)
+- Bumped object limits in the intersection/collision system (https://github.com/OldTimes-Software/jaded/issues/20)
+	+ Rewrote how collision flags are handled, which should be marginally easier on the CPU (and so we can eventually move away from hard-limits)
+- Removed "Perforce Refresh" option from Browser, given it's redundant now
+- Removed warning on 3,000 tris / 5,000 vert for geometry per request (https://github.com/OldTimes-Software/jaded/issues/26)
+- Changed some defaults for view in editor
+	+ Tris/obj warnings are now disabled by default
+	+ AfterEffects in editor are now enabled by default
+- It's now possible to use both PCM and ADPCM formats in the same project (https://github.com/OldTimes-Software/jaded/issues/12)
+- Simplified mipmap generation (works best if you have an OpenGL 3+ capable card)
+- Introduced a new splash screen
+- Translated internal exception warning to English
+- Translated material-type names to English
+- Additional assertions have been introduced to try and catch other faults, with better error handling in these situations
+- Continued massaging in JADEFUSION changes
+
+2023-04-19
+- Introduced fix for ShiftUsingNormal flag using wrong variable for storage (thanks Droolie!)
+	WARNING: this will break materials using fur in the original leaked BF, to resolve please use Droolie's patched BF via the link below.
+	https://www.raymanpc.com/forum/viewtopic.php?t=75066
+
+2023-04-13
+- Changed drag-camera shortcut to use SHIFT instead of ALT, as ALT is causing problems (UNDONE)
+
+2023-04-12
+- Fixed spelling for dialog presented when closing world without saving
+- Fixed 3D view displaying incorrectly if selection/toolbox dialog is not enabled
+- Removed some redundant checks
+- Disabled Perforce log
+- Now using C standard stdint.h, rather than Ubisoft's own, given we no longer live in the dark ages
+- Continued massaging in JADEFUSION changes (lightmap generation is partially in as of last release + other minor bits in this one)
+
+2023-04-11 (big thanks to MaeDaGoof for help with testing and Droolie for additional fixes!)
+- Fixed 3D View objects list not updating when it should
+- Fixed an oversight with the group association function (thanks to Droolie!)
+- Fixed paletted textures not working for DX8 renderer w/ some GPUs/drivers
+- Fixed a potential issue with pixel format setup relating to MSAA
+- Changed drag-camera shortcut to use SHIFT instead of ALT, as ALT is causing problems
+- SSE optimisations are now used by the editor
+- Bumped engine limits to match Droolie's fork
+- Executable has been renamed, again, for the last time to "Jaded"
+- Removed Perforce tool panels and eliminated Perforce-related requests
+- Incorporated remaining changes from Droolie's fork to ensure compatibility with patch
+
+2023-01-31
+- Fixed pixel format failing to set for some GPUs (thanks to Nimitz for their help testing!)
+- Fixed a crash that could occur after destroying and creating the GL context
+
+2023-01-30 (big thanks to MaeDaGoof for help with testing!)
+- Added support for MSAA and alpha-to-coverage if available (OpenGL only + disabled by default)
+- Added a new "Anti Aliasing" option under 3D View Options
+- Added shortcut for RayDevWiki under Help menu
+- Fixed Prefab browser crash that impacted some folks when previews are enabled
+- Fixed an issue with paletted textures under the Direct3D 8 renderer
+- Fixed "Full Maximized" resulting in menus to no longer be visible, making it hard to switch back
+- Fixed a possible issue that might arise when using the "Full Maximized" while a frame is already maximized
+- Changed how 3D View "Full Maximized" works, so it behaves more like a borderless fullscreen mode
+- Switched over to using GLEW for handling GL extensions
+- A debug dump will automatically be generated, if possible, if and when the application crashes
+	(this won't catch *all* cases right now but I'll improve on it next time)
+
+2023-01-22
+- Added "Limit FPS" toggle under Engine menu
+- Added more information to display upon saving a map (including time taken)
+- Added some additional sanity checks for Preview pane in Prefabs browser
+	(unlikely to fix the crash some folks are having, but who knows)
+- Fixed long save time when saving a world
+- Fixed menu string for second "Save World" option
+- Fixed missing icon for prefabs in browser
+- Renamed editor executable to JadedEditor to avoid conflicts with other fan bug-fixes
+- Disabled prompt if warnings are present in log (obnoxious and unnecessary imo)
+
+2023-01-16
+- Overhauled joystick input to use SDL2's game controller API instead of DirectInput
+	+ Fixed input issue when unplugging a controller at run-time
+	+ You can now unplug/plug a controller in during run-time to your hearts content <3
+- Disabled FPS cap for now (will provide a toggle next release)
+- Fixed a crash when attempting to open a different level from the browser while the engine is active
+
+2023-01-15
+- Enabled "Jade Fusion" clipboard toggle for material editor
+- Cleaned up elements of the interface to display better with new common controls
+- Continued removing Perforce integration
+- Improvements to the "Run Engine (Speed)" option
+	+ Now automatically enables fog
+	+ Automatically sets 'Active Engine World' if necessary
+	+ Renamed so it's a little more obvious what it does; "Run Engine (Game Mode)"
+	(still not a perfect name, but to explain this will basically hide all editor-specific information and automatically set camera to engine)
+- Fixed an exception that was thrown upon duplicating an object
+- Fixed crash that occurred with prefab preview
+- Fixed a crash that occurred in the last release when opening a material
+	+ This gave me an opportunity to clean up a lot of this, so generally it should be a lot more stable!
+- Fixed error dialog when performing check on BF
+- Fixed BF check displaying nothing for some invalid entries, now will display key if no valid name exists
+
+2023-01-05
+- Rotating and moving the camera around should no longer slow to a crawl, particularly with the browser open
+- Introduced a rough FPS cap when running the engine within the editor
+- Editor will now use newer common controls (i.e. more modern appearance)
+- Started gradually scraping out Perforce code (will replace with a better solution in long-term)
+- Fixed flickering with animation graph
+- Fixed malformed strings in texture editor
+- Fixed some issues with the OpenGL backend which could potentially cause issues w/ modern drivers
+- Fixed missing key error by automatically setting it up on launch if it doesn't exist
+- Fixed an issue with displaying paletted textures on some AMD GPUs / drivers
+	disclaimer: might incorrectly display some textures due to nature of fix, but I've not encountered any issues
