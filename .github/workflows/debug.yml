@@ -18,12 +18,15 @@ env:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2022
     defaults:
       run:
         shell: cmd
     steps:
       - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
       - name: 'Setup MSBuild'
         uses: microsoft/setup-msbuild@v2
         with:
@@ -31,17 +34,16 @@ jobs:
 
       - name: Configure CMake
         run: |
-          mkdir build
-          cd build
-          cmake .. -G "%CMAKE_GENERATOR%" -A "%CMAKE_ARCH%" -D CMAKE_BUILD_TYPE=Debug
+          cmake -B build -G "%CMAKE_GENERATOR%" -A "%CMAKE_ARCH%" -D CMAKE_BUILD_TYPE=Debug
 
       - name: Build Project
         run: |
-          cd build
-          cmake --build . --config %BUILD_TYPE% --target %PROJECT_NAME% --parallel 8
+          cmake --build build --config %BUILD_TYPE% --target %PROJECT_NAME% --parallel 8
 
       - name: 'Package Debug Build'
-        run: zip -9 jaded-debug.zip runtime/* runtime/mappings/* changes.txt
+        shell: pwsh
+        run: |
+          Compress-Archive -Path runtime, changes.txt -DestinationPath jaded-debug.zip -Force
 
       #- name: 'Upload to Discord'
       #  if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
