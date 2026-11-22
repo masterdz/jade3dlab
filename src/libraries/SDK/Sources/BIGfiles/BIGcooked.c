@@ -71,13 +71,14 @@ BOOL BIG_b_IsCookedBigFile(void)
 BOOL BIG_b_DetectCookedBigFile(void)
 {
     ULONG i, ul_BinCount = 0;
+    char *psz_Name;
 
     if(BIG_Version() == BIG_Cu4_Version_POP || BIG_Version() == BIG_Cu4_Version_POP2)
         return TRUE;
 
     for(i = 0; i < BIG_gst.st_ToSave.ul_MaxFile; i++)
     {
-        char *psz_Name = BIG_NameFile(i);
+        psz_Name = BIG_NameFile(i);
         if(psz_Name && *psz_Name)
         {
             if(strstr(psz_Name, ".bin") || strstr(psz_Name, "_wow_") || strstr(psz_Name, "_wol_"))
@@ -100,14 +101,16 @@ static void BIG_Cooked_AddSubEntry(BIG_KEY _ul_Key, ULONG _ul_BinPos, BIG_KEY _u
                                    ULONG _ul_Offset, ULONG _ul_Size, ULONG _ul_Type)
 {
     ULONG ul_Idx, ul_Bucket;
+    ULONG ul_NewCap;
+    BIG_tdst_CookedSubEntry *p_New;
 
     if(_ul_Key == 0 || _ul_Key == BIG_C_InvalidKey) return;
 
     /* Expand capacity if needed */
     if(BIG_gul_CookedSubEntryCount >= s_ul_CookedCapacity)
     {
-        ULONG ul_NewCap = s_ul_CookedCapacity ? (s_ul_CookedCapacity * 2) : 32768;
-        BIG_tdst_CookedSubEntry *p_New = (BIG_tdst_CookedSubEntry*)MEM_p_Alloc(ul_NewCap * sizeof(BIG_tdst_CookedSubEntry));
+        ul_NewCap = s_ul_CookedCapacity ? (s_ul_CookedCapacity * 2) : 32768;
+        p_New = (BIG_tdst_CookedSubEntry*)MEM_p_Alloc(ul_NewCap * sizeof(BIG_tdst_CookedSubEntry));
         if(!p_New) return;
 
         if(BIG_gast_CookedSubEntries)
@@ -170,6 +173,7 @@ static char* BIG_Cooked_GetCachedBin(ULONG _ul_BinPos, BIG_KEY _ul_BinKey, ULONG
     ULONG ul_Length, r;
     void *p_Raw;
     char *p_Dec;
+    char *p_Owned;
 
     s_ul_CacheClock++;
 
@@ -213,7 +217,7 @@ static char* BIG_Cooked_GetCachedBin(ULONG _ul_BinPos, BIG_KEY _ul_BinKey, ULONG
     p_Dec = BIG_special_LZOload((char*)p_Raw, &ul_Length);
     if(p_Dec != (char*)p_Raw)
     {
-        char *p_Owned = (char*)MEM_p_Alloc(ul_Length + 1);
+        p_Owned = (char*)MEM_p_Alloc(ul_Length + 1);
         if(p_Owned)
         {
             L_memcpy(p_Owned, p_Dec, ul_Length);
@@ -247,20 +251,25 @@ static char* BIG_Cooked_GetCachedBin(ULONG _ul_BinPos, BIG_KEY _ul_BinKey, ULONG
  */
 static void BIG_Cooked_IndexOneBin(BIG_INDEX _ul_FatIdx)
 {
-    ULONG ul_BinPos = BIG_PosFile(_ul_FatIdx);
-    BIG_KEY ul_BinKey = BIG_FileKey(_ul_FatIdx);
+    ULONG ul_BinPos;
+    BIG_KEY ul_BinKey;
     ULONG ul_BinSize = 0;
-    char *pc_Data = BIG_Cooked_GetCachedBin(ul_BinPos, ul_BinKey, &ul_BinSize);
+    char *pc_Data;
     ULONG pos = 0;
+    ULONG ul_SubSize, ul_Magic, ul_Key, ul_Type;
+
+    ul_BinPos = BIG_PosFile(_ul_FatIdx);
+    ul_BinKey = BIG_FileKey(_ul_FatIdx);
+    pc_Data = BIG_Cooked_GetCachedBin(ul_BinPos, ul_BinKey, &ul_BinSize);
 
     if(!pc_Data || ul_BinSize < 12) return;
 
     while(pos + 12 <= ul_BinSize)
     {
-        ULONG ul_SubSize = *(ULONG*)(pc_Data + pos);
-        ULONG ul_Magic   = *(ULONG*)(pc_Data + pos + 4);
-        ULONG ul_Key     = *(ULONG*)(pc_Data + pos + 8);
-        ULONG ul_Type    = 0;
+        ul_SubSize = *(ULONG*)(pc_Data + pos);
+        ul_Magic   = *(ULONG*)(pc_Data + pos + 4);
+        ul_Key     = *(ULONG*)(pc_Data + pos + 8);
+        ul_Type    = 0;
 
         if(ul_Magic != BIG_C_CookedMagic)
             break;
@@ -285,6 +294,7 @@ static void BIG_Cooked_IndexOneBin(BIG_INDEX _ul_FatIdx)
 void BIG_Cooked_Init(void)
 {
     ULONG i;
+    char *psz_Name;
 
     BIG_Cooked_Close();
 
@@ -302,7 +312,7 @@ void BIG_Cooked_Init(void)
     /* Scan each file in FAT */
     for(i = 0; i < BIG_gst.st_ToSave.ul_MaxFile; i++)
     {
-        char *psz_Name = BIG_NameFile(i);
+        psz_Name = BIG_NameFile(i);
         if(psz_Name && *psz_Name)
         {
             if(strstr(psz_Name, ".bin") || strstr(psz_Name, "_wow_") || strstr(psz_Name, "_wol_"))
@@ -356,10 +366,11 @@ void BIG_Cooked_Close(void)
  */
 ULONG BIG_Cooked_SearchKeyToPos(BIG_KEY _ul_Key)
 {
+    ULONG ul_Idx;
     BIG_tdst_CookedSubEntry *pst_Sub = BIG_pst_Cooked_FindSubEntry(_ul_Key);
     if(pst_Sub)
     {
-        ULONG ul_Idx = (ULONG)(pst_Sub - BIG_gast_CookedSubEntries);
+        ul_Idx = (ULONG)(pst_Sub - BIG_gast_CookedSubEntries);
         return BIG_C_CookedPosFlag | ul_Idx;
     }
     return BIG_C_InvalidIndex;

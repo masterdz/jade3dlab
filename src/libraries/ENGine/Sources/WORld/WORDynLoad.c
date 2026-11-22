@@ -5,15 +5,15 @@
  * ======================================================================================================================= */
 
 #include "Precomp.h"
-#include "SDK/Sources/BIGfiles/BIGdefs.h"
-#include "SDK/Sources/BIGfiles/BIGfat.h"
-#include "SDK/Sources/BIGfiles/BIGread.h"
-#include "SDK/Sources/BIGfiles/BIGkey.h"
-#include "SDK/Sources/BIGfiles/BIGcooked.h"
-#include "ENGine/Sources/WORld/WORstruct.h"
-#include "ENGine/Sources/WORld/WORuniverse.h"
-#include "ENGine/Sources/WORld/WORload.h"
-#include "ENGine/Sources/WORld/WORDynLoad.h"
+#include "BIGfiles/BIGdefs.h"
+#include "BIGfiles/BIGfat.h"
+#include "BIGfiles/BIGread.h"
+#include "BIGfiles/BIGkey.h"
+#include "BIGfiles/BIGcooked.h"
+#include "WORld/WORstruct.h"
+#include "WORld/WORuniverse.h"
+#include "WORld/WORload.h"
+#include "WORld/WORDynLoad.h"
 
 /*
  =======================================================================================================================
@@ -26,13 +26,14 @@ void WOR_ExpandWorldList(BIG_KEY _ul_WolKey)
     ULONG ul_Pos, ul_Length = 0;
     char *pc_Buf;
     ULONG i, ul_NbEntries;
+    ULONG ul_RoomKey, ul_Type;
 
     if(_ul_WolKey == 0 || _ul_WolKey == BIG_C_InvalidKey) return;
 
     ul_Pos = BIG_ul_SearchKeyToPos(_ul_WolKey);
     if(ul_Pos == BIG_C_InvalidIndex)
     {
-        ERR_X_Error(0, "Invalid key (%08X) found WOR_ExpandWorldList", (void*)(uintptr_t)_ul_WolKey);
+        ERR_X_Error(0, "Invalid key (%08X) found WOR_ExpandWorldList", (void*)(ULONG)_ul_WolKey);
         return;
     }
 
@@ -49,21 +50,21 @@ void WOR_ExpandWorldList(BIG_KEY _ul_WolKey)
     ul_NbEntries = ul_Length >> 3;
     for(i = 0; i < ul_NbEntries; i++)
     {
-        ULONG ul_RoomKey = *(ULONG*)(pc_Buf + i * 8);
-        ULONG ul_Type    = *(ULONG*)(pc_Buf + i * 8 + 4);
+        ul_RoomKey = *(ULONG*)(pc_Buf + i * 8);
+        ul_Type    = *(ULONG*)(pc_Buf + i * 8 + 4);
 
         if(ul_RoomKey == 0 || ul_RoomKey == BIG_C_InvalidKey) continue;
 
         if(ul_Type != 0x776F772E /* ".wow" */)
         {
-            ERR_X_Warning(0, "Non-WOW entry in WorldList", (void*)(uintptr_t)ul_RoomKey);
+            ERR_X_Warning(0, "Non-WOW entry in WorldList", (void*)(ULONG)ul_RoomKey);
             continue;
         }
 
         /* Verify that room key can be resolved in BigFile */
         if(BIG_ul_SearchKeyToPos(ul_RoomKey) == BIG_C_InvalidIndex)
         {
-            ERR_X_Warning(0, "WorldList references unresolvable room", (void*)(uintptr_t)ul_RoomKey);
+            ERR_X_Warning(0, "WorldList references unresolvable room", (void*)(ULONG)ul_RoomKey);
         }
     }
 }

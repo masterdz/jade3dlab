@@ -414,7 +414,7 @@ char *BIG_pc_ReadPartOfFileTmp(ULONG _ul_Pos, ULONG ul_ReadSize)
 	/* Cooked virtual position (0x80000000 | index) */
 	if(_ul_Pos & BIG_C_CookedPosFlag)
 	{
-		return BIG_pc_Cooked_ReadFileTmp(_ul_Pos, _pul_Length);
+		return BIG_pc_Cooked_ReadFileTmp(_ul_Pos, &ul_Length);
 	}
 
 	if(BIG_gi_ReadMode == 2)
